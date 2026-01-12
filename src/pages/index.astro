@@ -25,20 +25,26 @@ const tabList = [
         :root { --pjn-red: #ce1126; --bg-color: #f4f6f8; }
         body { font-family: sans-serif; margin: 0; background: var(--bg-color); }
         
-        /* スマホで1行に収めるためのヘッダー調整 */
         header { 
             background: var(--pjn-red); color: white; 
-            padding: 0.8rem 0.5rem; text-align: center; 
+            padding: 1rem 0.5rem; text-align: center; 
             position: sticky; top: 0; z-index: 1000; 
         }
-        header h1 { margin: 0; font-size: 1.1rem; letter-spacing: 1px; }
-        .site-desc { font-size: 0.7rem; margin-top: 4px; opacity: 0.9; }
+        header h1 { margin: 0; font-size: 1.1rem; letter-spacing: 1px; font-weight: bold; }
+        .site-desc { font-size: 0.75rem; margin-top: 4px; opacity: 0.95; font-weight: normal; }
+
+        @media (min-width: 768px) {
+            header h1 { font-size: 1.6rem; }
+            .site-desc { font-size: 0.95rem; }
+        }
 
         .nav-container { 
-            background: #fff; position: sticky; top: 58px; z-index: 999; 
+            background: #fff; position: sticky; top: 68px; z-index: 999; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
             overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; 
         }
+        @media (min-width: 768px) { .nav-container { top: 90px; } }
+
         .nav-container::-webkit-scrollbar { display: none; }
         .nav-tabs { display: inline-flex; padding: 0; margin: 0; list-style: none; }
         .tab-item { padding: 12px 15px; font-weight: bold; font-size: 0.85rem; color: #555; cursor: pointer; position: relative; }
@@ -54,15 +60,17 @@ const tabList = [
         summary { padding: 15px; list-style: none; cursor: pointer; }
         .date { font-size: 0.65rem; color: #999; }
         .badge { font-size: 0.65rem; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; margin-left: 5px; }
-        .title { font-size: 0.95rem; font-weight: bold; margin-top: 5px; display: block; line-height: 1.4; }
-        .content { padding: 0 15px 15px; border-top: 1px solid #f5f5f5; font-size: 0.9rem; line-height: 1.6; }
+        .title { font-size: 0.95rem; font-weight: bold; margin-top: 5px; display: block; line-height: 1.4; color: #111; }
+        .content { padding: 0 15px 15px; border-top: 1px solid #f5f5f5; font-size: 0.9rem; line-height: 1.7; }
         .hidden { display: none; }
+        :global(h3) { font-size: 1rem; color: var(--pjn-red); margin: 15px 0 10px; border-left: 4px solid var(--pjn-red); padding-left: 8px; }
+        :global(.source-link) { display: inline-block; margin-top: 15px; font-size: 0.8rem; color: #005596; text-decoration: none; background: #f8f9fa; padding: 5px 10px; border-radius: 4px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
     <header>
         <h1>PENANG JAPANESE NEWS</h1>
-        <p class="site-desc">ペナン現地ニュースを厳選、毎日更新</p>
+        <p class="site-desc">ペナン現地ニュースを厳選、毎日日本語で更新</p>
     </header>
     <nav class="nav-container">
         <ul class="nav-tabs">
@@ -73,9 +81,9 @@ const tabList = [
     </nav>
     <main><div class="news-grid">
         {sortedPosts.map(post => (
-            <details class="article-card" data-category={post.frontmatter.category}>
+            <details class="article-card" data-category={post.frontmatter.category || "暮らし"}>
                 <summary>
-                    <div><span class="date">{post.frontmatter.date}</span><span class="badge">{post.frontmatter.category}</span></div>
+                    <div><span class="date">{(post.frontmatter.date || "").toString().replace(/-/g, '/')}</span><span class="badge">{post.frontmatter.category || "暮らし"}</span></div>
                     <span class="title">{post.frontmatter.title}</span>
                 </summary>
                 <div class="content"><post.Content /></div>
