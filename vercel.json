@@ -1,0 +1,11 @@
+{
+  "framework": "astro",
+  "functions": {
+    "src/pages/api/*.js": {
+      "runtime": "nodejs20.x"
+    },
+    "_render": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
