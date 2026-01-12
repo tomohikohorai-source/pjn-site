@@ -7,8 +7,6 @@ import time
 
 # --- 設定 ---
 API_KEY = os.environ["GEMINI_API_KEY"]
-# 確実に存在するモデル名とAPIバージョンを指定
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
 
 POSTS_DIR = "src/pages/posts"
 os.makedirs(POSTS_DIR, exist_ok=True)
@@ -18,7 +16,32 @@ RSS_URLS = [
     "https://www.thestar.com.my/rss/metro/community"
 ]
 
-def ask_ai(title, summary, link):
+def get_working_model():
+    """お使いのAPIキーで今使えるモデルを自動で探します"""
+    # 試行するエンドポイントとモデルの組み合わせ
+    options = [
+        ("v1", "gemini-1.5-flash"),
+        ("v1", "gemini-pro"),
+        ("v1beta", "gemini-1.5-flash"),
+        ("v1beta", "gemini-pro")
+    ]
+    
+    for version, model_name in options:
+        url = f"https://generativelanguage.googleapis.com/{version}/models/{model_name}:generateContent?key={API_KEY}"
+        test_payload = {"contents": [{"parts": [{"text": "Hi"}]}]}
+        try:
+            response = requests.post(url, headers={'Content-Type': 'application/json'}, data=json.dumps(test_payload))
+            if response.status_code == 200:
+                print(f"成功: モデル '{model_name}' (バージョン {version}) が使用可能です。")
+                return url
+        except:
+            continue
+    
+    # すべて失敗した場合は現在のモデルリストをログに出してデバッグする
+    print("利用可能なモデルが見つかりません。APIキーの設定を確認してください。")
+    return None
+
+def ask_ai(api_url, title, summary, link):
     print(f"AI翻訳中: {title}")
     
     prompt = f"""
@@ -35,7 +58,7 @@ def ask_ai(title, summary, link):
     4. 最後に「🔗 参照元記事を確認する」というリンクをつける。
     5. 出力は以下のMarkdown形式で。
     ---
-    title: "【ジャンル】タイトル"
+    title: "{title}"
     date: "{datetime.date.today()}"
     category: "ニュース"
     ---
@@ -43,51 +66,48 @@ def ask_ai(title, summary, link):
     <h3>【内容（全文翻訳）】</h3>
     """
 
-    payload = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
-    }
-    headers = {'Content-Type': 'application/json'}
-
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
+    
     try:
-        response = requests.post(API_URL, headers=headers, data=json.dumps(payload))
+        response = requests.post(api_url, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
         data = response.json()
-        
-        # エラーチェック
         if "candidates" in data:
             return data["candidates"][0]["content"]["parts"][0]["text"]
         else:
-            print(f"APIエラー: {data}")
+            print(f"翻訳エラー: {data}")
             return None
     except Exception as e:
         print(f"接続エラー: {e}")
         return None
 
 # --- メイン処理 ---
-print("ニュース取得開始...")
-articles_count = 0
+print("システム起動...")
+active_url = get_working_model()
 
-for url in RSS_URLS:
-    feed = feedparser.parse(url)
-    print(f"ソース取得: {url} (記事数: {len(feed.entries)})")
-    
-    for entry in feed.entries[:5]: 
-        if articles_count >= 10: break
+if not active_url:
+    print("【致命的エラー】利用可能なAIモデルが1つも見つかりませんでした。APIキーが正しくコピーされているか、Google AI Studioで新しいキーを作成し直すことをお勧めします。")
+else:
+    print("ニュース取得開始...")
+    articles_count = 0
+    for url in RSS_URLS:
+        feed = feedparser.parse(url)
+        print(f"ソース取得: {url} (記事数: {len(feed.entries)})")
         
-        clean_title = "".join([c for c in entry.title if c.isalnum() or c==' '])[:30].strip().replace(" ", "_")
-        filename = os.path.join(POSTS_DIR, f"{datetime.date.today()}-{clean_title}.md")
-        
-        if os.path.exists(filename): continue
+        for entry in feed.entries[:5]: 
+            if articles_count >= 10: break
+            
+            clean_title = "".join([c for c in entry.title if c.isalnum() or c==' '])[:30].strip().replace(" ", "_")
+            filename = os.path.join(POSTS_DIR, f"{datetime.date.today()}-{clean_title}.md")
+            
+            if os.path.exists(filename): continue
 
-        article_md = ask_ai(entry.title, entry.summary, entry.link)
-        
-        if article_md:
-            with open(filename, "w", encoding="utf-8") as f:
-                f.write(article_md)
-            print(f"保存完了: {filename}")
-            articles_count += 1
-        
-        time.sleep(2)
+            article_md = ask_ai(active_url, entry.title, entry.summary, entry.link)
+            
+            if article_md:
+                with open(filename, "w", encoding="utf-8") as f:
+                    f.write(article_md)
+                print(f"保存完了: {filename}")
+                articles_count += 1
+            time.sleep(1)
 
-print(f"本日の業務終了。作成記事数: {articles_count}")
+    print(f"本日の業務終了。作成記事数: {articles_count}")
