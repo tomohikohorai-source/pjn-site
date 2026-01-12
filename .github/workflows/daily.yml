@@ -1,0 +1,27 @@
+name: Daily PJN Update
+on:
+  schedule:
+    - cron: '0 22 * * *' # 日本時間 朝7時に自動実行
+  workflow_dispatch: # 手動で実行ボタンを押せるようにする
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install feedparser google-generativeai
+      - name: Run Bot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python pjn_bot.py
+      - name: Commit and Push
+        run: |
+          git config --global user.name "PJN Bot"
+          git config --global user.email "bot@pjn.com"
+          git add src/pages/posts/*.md
+          git commit -m "Update news" || exit 0
+          git push
