@@ -4,17 +4,17 @@ import feedparser
 import google.generativeai as genai
 
 # --- 設定 ---
+# 最新の安定モデル名に変更
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# 保存先フォルダの作成（これがないと保存に失敗します）
 POSTS_DIR = "src/pages/posts"
 os.makedirs(POSTS_DIR, exist_ok=True)
 
-# ニュースソース（複数のソースを試すように改良）
+# ニュースソース（確実に記事があるNationニュースを優先）
 RSS_URLS = [
-    "https://www.thestar.com.my/rss/metro/community",
-    "https://www.thestar.com.my/rss/news/nation"
+    "https://www.thestar.com.my/rss/news/nation",
+    "https://www.thestar.com.my/rss/metro/community"
 ]
 
 def ask_ai(title, summary, link):
@@ -28,10 +28,11 @@ def ask_ai(title, summary, link):
     内容: {summary}
 
     【出力ルール】
-    1. 冒頭に「ジャンル：〇〇」を明記（教育、生活、交通など）
-    2. 本文は3-4行ごとに改行を入れ、読みやすく。
-    3. 最後に「🔗 参照元記事を確認する」というリンクをつける。
-    4. 出力は以下のMarkdown形式の「中身」だけを出力してください。
+    1. 冒頭に「ジャンル：〇〇」を明記（教育、生活、交通、事件など）
+    2. タイトルは「【ジャンル】タイトル」の形式に。
+    3. 本文は3-4行ごとに改行を入れ、読みやすく。
+    4. 最後に「🔗 参照元記事を確認する」というリンクをつける。
+    5. 出力は以下のMarkdown形式の「中身」だけを出力してください。
     ---
     title: "{title}"
     date: "{datetime.date.today()}"
@@ -39,15 +40,16 @@ def ask_ai(title, summary, link):
     ---
     <div class="genre-label">ジャンル：ニュース</div>
     <h3>【内容（全文翻訳）】</h3>
-    (本文をここに)
+    (翻訳された本文をここに)
 
     <a href="{link}" class="source-link">🔗 参照元記事を確認する</a>
     """
     try:
+        # AIへのリクエスト
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        print(f"AIエラー: {e}")
+        print(f"AIエラーが発生しました: {e}")
         return None
 
 # --- メイン処理 ---
@@ -58,14 +60,13 @@ for url in RSS_URLS:
     feed = feedparser.parse(url)
     print(f"ソース取得中: {url} (記事数: {len(feed.entries)})")
     
-    for entry in feed.entries[:5]: # 各ソースから最大5件
+    for entry in feed.entries[:5]: 
         if articles_count >= 10: break
         
-        # ファイル名の作成（記号などを除去）
-        safe_title = "".join([c for c in entry.title if c.isalnum() or c==' '])[:30].replace(" ", "_")
-        filename = os.path.join(POSTS_DIR, f"{datetime.date.today()}-{safe_title}.md")
+        # 安全なファイル名の作成
+        clean_title = "".join([c for c in entry.title if c.isalnum() or c==' '])[:30].strip().replace(" ", "_")
+        filename = os.path.join(POSTS_DIR, f"{datetime.date.today()}-{clean_title}.md")
         
-        # すでにファイルがある場合はスキップ
         if os.path.exists(filename):
             continue
 
