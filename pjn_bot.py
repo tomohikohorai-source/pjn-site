@@ -1,17 +1,16 @@
 import os
 import datetime
 import feedparser
-import google.generativeai as genai
+from google import genai # 最新の呼び出し方に変更
 
 # --- 設定 ---
-# 最新の安定モデル名に変更
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
+# 最新のGoogle GenAIクライアントを使用
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 POSTS_DIR = "src/pages/posts"
 os.makedirs(POSTS_DIR, exist_ok=True)
 
-# ニュースソース（確実に記事があるNationニュースを優先）
+# ニュースソース
 RSS_URLS = [
     "https://www.thestar.com.my/rss/news/nation",
     "https://www.thestar.com.my/rss/metro/community"
@@ -45,8 +44,11 @@ def ask_ai(title, summary, link):
     <a href="{link}" class="source-link">🔗 参照元記事を確認する</a>
     """
     try:
-        # AIへのリクエスト
-        response = model.generate_content(prompt)
+        # 新しいAPI形式での呼び出し
+        response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt
+        )
         return response.text
     except Exception as e:
         print(f"AIエラーが発生しました: {e}")
