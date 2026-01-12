@@ -13,15 +13,15 @@ API_URL = f"https://generativelanguage.googleapis.com/v1/models/{MODEL_NAME}:gen
 POSTS_DIR = "src/pages/posts"
 os.makedirs(POSTS_DIR, exist_ok=True)
 
-# Googleニュース経由で「ペナン」と「マレーシア」の最新情報を取得（ブロックされにくい）
+# Googleニュース経由（ペナンと教育関連）
 RSS_URLS = [
     "https://news.google.com/rss/search?q=Penang+when:24h&hl=en-MY&gl=MY&ceid=MY:en",
     "https://news.google.com/rss/search?q=Malaysia+Education+when:24h&hl=en-MY&gl=MY&ceid=MY:en"
 ]
 
 def ask_ai(title, summary, link):
-    print(f"AI翻訳依頼中: {title[:30]}...")
-    prompt = f"以下の英語ニュースをペナン在住日本人向けに翻訳・整形して。1行目は「ジャンル：〇〇」として。タイトル: {title}, 内容: {summary}"
+    print(f"🤖 AI翻訳依頼中: {title[:40]}...")
+    prompt = f"以下の英語ニュースをペナン在住日本人向けに翻訳・整形して。1行目は「ジャンル：〇〇」として（グルメ、重要、暮らし、おでかけ、教育、エンタメ、お得 のいずれか）。タイトル: {title}, 内容: {summary}"
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
     try:
@@ -49,34 +49,43 @@ category: "{genre}"
 
 <a href="{link}" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元記事を確認する</a>
 """
-    except:
+        else:
+            print(f"   ⚠️ AIエラー (Code {response.status_code}): {response.text[:100]}")
+            return None
+    except Exception as e:
+        print(f"   ⚠️ 通信エラー: {e}")
         return None
 
 # --- メイン実行 ---
-print(f"PJN Bot 起動 (Google News RSS使用)")
+print(f"🚀 PJN Bot 始動")
 count = 0
 
 for url in RSS_URLS:
     if count >= 3: break
-    print(f"ニュース取得開始: {url}")
+    print(f"📡 ニュース取得中: {url}")
     feed = feedparser.parse(url)
-    print(f"取得結果: {len(feed.entries)}件発見")
-
-    for entry in feed.entries:
+    
+    # ニュースの冒頭5件だけを対象にする（API節約のため）
+    for entry in feed.entries[:5]:
         if count >= 3: break
         
-        # タイトルからファイル名作成
+        # 安全なファイル名の作成
         safe_title = "".join([c for c in entry.title if c.isalnum() or c==' '])[:30].strip().replace(" ", "_")
         filename = os.path.join(POSTS_DIR, f"{datetime.date.today()}-{safe_title}.md")
         
         if os.path.exists(filename): continue
 
         result = ask_ai(entry.title, entry.summary, entry.link)
+        
         if result:
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(result)
-            print(f"✅ 保存完了: {filename}")
+            print(f"   ✅ 保存成功: {filename}")
             count += 1
+            print("   💤 成功したので60秒間休みます...")
             time.sleep(60)
+        else:
+            print("   💤 失敗したので30秒間休みます...")
+            time.sleep(30)
 
-print(f"完了。作成記事数: {count}")
+print(f"🏁 完了。作成した記事数: {count}")
