@@ -1,8 +1,7 @@
 ---
-// 記事を取得（エラー回避のため空の配列も許容する）
 const posts = await Astro.glob('./posts/*.md');
 const sortedPosts = posts
-    .filter(post => post.frontmatter.title) // タイトルがない壊れたファイルを除外
+    .filter(post => post.frontmatter.title)
     .sort((a, b) => new Date(b.frontmatter.date || 0).getTime() - new Date(a.frontmatter.date || 0).getTime());
 
 const tabList = [
@@ -24,30 +23,50 @@ const tabList = [
     <style>
         :root { --pjn-red: #ce1126; --tab-bg: #fff; --bg-color: #f4f6f8; }
         body { font-family: sans-serif; margin: 0; background: var(--bg-color); color: #333; }
-        header { background: var(--pjn-red); color: white; padding: 1.2rem; text-align: center; position: sticky; top: 0; z-index: 1000; }
-        header h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; }
-        .nav-container { background: var(--tab-bg); position: sticky; top: 58px; z-index: 999; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        
+        header { background: var(--pjn-red); color: white; padding: 1.5rem 1rem; text-align: center; position: sticky; top: 0; z-index: 1000; }
+        header h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; font-weight: bold; }
+        .site-desc { 
+            font-size: 0.85rem; 
+            margin-top: 10px; 
+            opacity: 0.95; 
+            line-height: 1.5;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .nav-container { background: var(--tab-bg); position: sticky; top: 105px; z-index: 999; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
         .nav-container::-webkit-scrollbar { display: none; }
         .nav-tabs { display: inline-flex; padding: 0 10px; margin: 0; list-style: none; }
         .tab-item { padding: 15px 22px; font-weight: bold; font-size: 0.95rem; cursor: pointer; color: #555; position: relative; }
         .tab-item.active { color: var(--pjn-red); }
         .tab-item.active::after { content: ""; position: absolute; bottom: 0; left: 20%; right: 20%; height: 4px; background: var(--pjn-red); border-radius: 2px; }
+        
         main { padding: 20px; max-width: 1400px; margin: auto; }
         .news-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
         @media (min-width: 768px) { .news-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1100px) { .news-grid { grid-template-columns: repeat(3, 1fr); } }
-        details { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); height: fit-content; }
+        
+        details { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05); height: fit-content; transition: 0.2s; }
         summary { padding: 20px; list-style: none; cursor: pointer; display: flex; flex-direction: column; }
+        summary::-webkit-details-marker { display: none; }
         .date { font-size: 0.75rem; color: #999; font-weight: bold; }
         .badge { font-size: 0.7rem; background: #f0f0f0; padding: 2px 8px; border-radius: 4px; margin-left: 5px; }
-        .title { font-size: 1.15rem; font-weight: bold; margin-top: 10px; line-height: 1.5; }
-        .content { padding: 0 20px 20px; border-top: 1px solid #f0f0f0; line-height: 1.8; }
+        .title { font-size: 1.1rem; font-weight: bold; margin-top: 10px; line-height: 1.5; color: #111; }
+        .content { padding: 0 20px 20px; border-top: 1px solid #f0f0f0; line-height: 1.8; font-size: 0.95rem; }
         .hidden { display: none; }
         :global(.source-link) { display: inline-block; margin-top: 15px; font-size: 0.85rem; color: #005596; text-decoration: none; background: #f8f9fa; padding: 5px 12px; border-radius: 6px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <header><h1>PENANG JAPANESE NEWS</h1></header>
+    <header>
+        <h1>PENANG JAPANESE NEWS</h1>
+        <p class="site-desc">
+            ペナンの現地ニュースから日本人に関係する情報を厳選し、毎日更新。<br>
+            現地の「今」を、分かりやすい日本語に翻訳して配信しています。
+        </p>
+    </header>
     <nav class="nav-container">
         <ul class="nav-tabs">
             {tabList.map((tab, index) => (
@@ -81,6 +100,7 @@ const tabList = [
                 const target = tab.getAttribute('data-target');
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
+                tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 articles.forEach(article => {
                     const cat = article.getAttribute('data-category');
                     if (target === 'all' || cat === target) {
