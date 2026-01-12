@@ -1,0 +1,20 @@
+backend:
+  name: github
+  repo: あなたのユーザー名/pjn-site # 自分の名前に書き換え！
+  branch: main
+  base_url: https://pjn-auth-gate.vercel.app # ログイン用の合鍵の場所
+  site_domain: あなたのサイト.vercel.app # 自分のサイトURL
+
+publish_mode: editorial_workflow # 下書き保存機能を使う設定
+
+collections:
+  - name: "posts"
+    label: "記事一覧"
+    folder: "src/pages/posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "タイトル", name: "title", widget: "string" }
+      - { label: "公開日", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "ジャンル", name: "category", widget: "select", options: ["重要", "コラム", "グルメ", "おでかけ", "暮らし", "教育", "エンタメ", "お得"] }
+      - { label: "本文", name: "body", widget: "markdown" }
