@@ -2,7 +2,17 @@
 const posts = await Astro.glob('./posts/*.md');
 const sortedPosts = posts.sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
 
-const categories = ["重要", "生活", "お得", "教育"];
+// ジャンル設定（タブに表示する順序）
+const tabList = [
+    { id: "all", label: "トピック" },
+    { id: "重要", label: "重要" },
+    { id: "グルメ", label: "グルメ" },
+    { id: "おでかけ", label: "おでかけ" },
+    { id: "暮らし", label: "暮らし" },
+    { id: "教育", label: "教育" },
+    { id: "エンタメ", label: "エンタメ" },
+    { id: "お得", label: "お得" }
+];
 ---
 <html lang="ja">
 <head>
@@ -12,140 +22,158 @@ const categories = ["重要", "生活", "お得", "教育"];
     <style>
         :root {
             --pjn-red: #ce1126;
-            --tab-bg: #fff;
-            --bg-color: #f0f2f5;
+            --tab-bg: #ffffff;
+            --bg-color: #f4f6f8;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         body {
-            font-family: -apple-system, sans-serif;
+            font-family: -apple-system, "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
             margin: 0;
             background: var(--bg-color);
             color: #333;
         }
 
-        /* 固定ヘッダー */
+        /* ヘッダー */
         header {
             background: var(--pjn-red);
             color: white;
-            padding: 1rem;
+            padding: 1.2rem;
             text-align: center;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
+        header h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; font-weight: 900; }
 
-        header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; }
-
-        /* タブナビゲーション（SmartNews風） */
+        /* スマートニュース風タブナビゲーション */
         .nav-container {
             background: var(--tab-bg);
             position: sticky;
-            top: 52px; /* ヘッダーの高さに合わせて調整 */
-            z-index: 99;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            top: 58px; /* ヘッダーの高さ */
+            z-index: 999;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             overflow-x: auto;
             white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
         }
+        /* スクロールバーを非表示（デザイン重視） */
+        .nav-container::-webkit-scrollbar { display: none; }
+        .nav-container { -ms-overflow-style: none; scrollbar-width: none; }
 
         .nav-tabs {
-            display: flex;
+            display: inline-flex;
             padding: 0 10px;
             margin: 0;
             list-style: none;
         }
 
         .tab-item {
-            padding: 12px 20px;
+            padding: 15px 22px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            color: #666;
-            border-bottom: 3px solid transparent;
+            color: #555;
+            transition: 0.2s;
+            position: relative;
         }
 
         .tab-item.active {
             color: var(--pjn-red);
-            border-bottom: 3px solid var(--pjn-red);
         }
 
-        /* ニュースカードのグリッドレイアウト（レスポンシブ） */
+        .tab-item.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 4px;
+            background: var(--pjn-red);
+            border-radius: 2px 2px 0 0;
+        }
+
+        /* メインコンテンツエリア */
         main {
-            padding: 15px;
-            max-width: 1200px;
+            padding: 20px;
+            max-width: 1400px; /* PCでの幅を広く設定 */
             margin: auto;
         }
 
+        /* レスポンシブグリッド */
         .news-grid {
             display: grid;
-            gap: 15px;
-            /* スマホ: 1列 */
-            grid-template-columns: 1fr;
+            gap: 20px;
+            grid-template-columns: 1fr; /* デフォルト（スマホ） */
         }
 
-        @media (min-width: 600px) {
-            /* タブレット: 2列 */
-            .news-grid { grid-template-columns: repeat(2, 1fr); }
+        @media (min-width: 768px) {
+            .news-grid { grid-template-columns: repeat(2, 1fr); } /* タブレット */
         }
 
-        @media (min-width: 1024px) {
-            /* PC: 3列 */
-            .news-grid { grid-template-columns: repeat(3, 1fr); }
+        @media (min-width: 1100px) {
+            .news-grid { grid-template-columns: repeat(3, 1fr); } /* PC */
         }
 
-        /* 記事カードの詳細デザイン */
+        /* 記事カード */
         details {
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            overflow: hidden;
-            border: 1px solid #eee;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.2s;
             height: fit-content;
         }
 
         summary {
-            padding: 15px;
+            padding: 20px;
             list-style: none;
             cursor: pointer;
             outline: none;
+            display: flex;
+            flex-direction: column;
         }
-        
         summary::-webkit-details-marker { display: none; }
 
-        .date { font-size: 0.7rem; color: #999; font-weight: bold; }
-        .category-badge {
-            font-size: 0.65rem;
-            background: #eee;
-            padding: 2px 6px;
+        .card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .date { font-size: 0.75rem; color: #999; font-weight: bold; }
+        .badge {
+            font-size: 0.7rem;
+            background: #f0f0f0;
+            color: #666;
+            padding: 2px 8px;
             border-radius: 4px;
-            margin-left: 5px;
-            vertical-align: middle;
+            font-weight: bold;
         }
 
         .title {
-            display: block;
-            font-size: 1rem;
+            font-size: 1.15rem;
             font-weight: bold;
-            margin-top: 8px;
-            line-height: 1.4;
+            line-height: 1.5;
+            color: #111;
         }
 
+        /* 展開後のコンテンツ */
         .content {
-            padding: 0 15px 15px;
-            border-top: 1px solid #f5f5f5;
-            font-size: 0.95rem;
-            line-height: 1.7;
+            padding: 0 20px 20px;
+            border-top: 1px solid #f0f0f0;
+            line-height: 1.8;
+            font-size: 1rem;
+            color: #444;
         }
 
+        :global(.genre-label) { display: none; } /* カード内の重複ジャンルを隠す */
+        :global(h3) { font-size: 1.1rem; color: var(--pjn-red); margin: 15px 0 10px; }
         :global(.source-link) {
-            display: block;
+            display: inline-block;
             margin-top: 15px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #005596;
             text-decoration: none;
+            background: #f8f9fa;
+            padding: 5px 12px;
+            border-radius: 6px;
         }
 
-        /* 表示・非表示の制御 */
         .hidden { display: none; }
     </style>
 </head>
@@ -156,11 +184,11 @@ const categories = ["重要", "生活", "お得", "教育"];
 
     <nav class="nav-container">
         <ul class="nav-tabs">
-            <li class="tab-item active" data-target="all">トピック</li>
-            <li class="tab-item" data-target="重要">重要</li>
-            <li class="tab-item" data-target="生活">生活</li>
-            <li class="tab-item" data-target="お得">お得</li>
-            <li class="tab-item" data-target="教育">教育</li>
+            {tabList.map((tab, index) => (
+                <li class={`tab-item ${index === 0 ? 'active' : ''}`} data-target={tab.id}>
+                    {tab.label}
+                </li>
+            ))}
         </ul>
     </nav>
 
@@ -169,8 +197,10 @@ const categories = ["重要", "生活", "お得", "教育"];
             {sortedPosts.map(post => (
                 <details class="article-card" data-category={post.frontmatter.category}>
                     <summary>
-                        <span class="date">{post.frontmatter.date}</span>
-                        <span class="category-badge">{post.frontmatter.category}</span>
+                        <div class="card-meta">
+                            <span class="date">{post.frontmatter.date.replace(/-/g, '/')}</span>
+                            <span class="badge">{post.frontmatter.category}</span>
+                        </div>
                         <span class="title">{post.frontmatter.title}</span>
                     </summary>
                     <div class="content">
@@ -182,7 +212,6 @@ const categories = ["重要", "生活", "お得", "教育"];
     </main>
 
     <script>
-        // タブ切り替えロジック
         const tabs = document.querySelectorAll('.tab-item');
         const articles = document.querySelectorAll('.article-card');
 
@@ -190,13 +219,15 @@ const categories = ["重要", "生活", "お得", "教育"];
             tab.addEventListener('click', () => {
                 const target = tab.getAttribute('data-target');
 
-                // アクティブなタブの見た目を変更
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
 
-                // 記事のフィルタリング
+                // タブをクリックしたら中央にスクロール（モバイル用）
+                tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
                 articles.forEach(article => {
-                    if (target === 'all' || article.getAttribute('data-category') === target) {
+                    const artCat = article.getAttribute('data-category');
+                    if (target === 'all' || artCat === target) {
                         article.classList.remove('hidden');
                     } else {
                         article.classList.add('hidden');
