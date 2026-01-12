@@ -15,28 +15,41 @@ export async function GET({ url }) {
     const data = await res.json();
     const token = data.access_token;
 
-    // トークンが空でないか確認
     if (!token) {
-      return new Response("GitHubトークンの取得に失敗しました。ClientID/Secretが正しいか確認してください。", { status: 500 });
+      return new Response("トークンの取得に失敗しました。VercelのEnvironment Variablesを確認してください。", { status: 500 });
     }
 
-    // 文字化けを防ぐため UTF-8 を指定したレスポンス
+    // 文字化けを防ぎ、確実に親画面へメッセージを送り、確実に閉じるHTML
     const html = `
       <!DOCTYPE html>
       <html lang="ja">
-      <head><meta charset="utf-8"></head>
+      <head>
+        <meta charset="utf-8">
+        <title>認証完了</title>
+      </head>
       <body>
-        <p>認証に成功しました。管理画面に移動します...</p>
+        <div id="status">認証に成功しました。まもなく管理画面に戻ります...</div>
         <script>
           (function() {
+            const token = "${token}";
             const message = "authorization:github:success:" + JSON.stringify({
-              token: "${token}",
+              token: token,
               provider: "github"
             });
-            // 管理画面（親ウィンドウ）へメッセージを送信
-            window.opener.postMessage(message, window.location.origin);
-            // 0.5秒後に自動で閉じる
-            setTimeout(() => window.close(), 500);
+            
+            // 全ての可能性を考慮してメッセージを送信
+            if (window.opener) {
+              // ターゲットを "*" にすることで、オリジンの不一致によるブロックを回避
+              window.opener.postMessage(message, "*");
+              console.log("Success: Token sent to opener.");
+            } else {
+              document.getElementById("status").innerText = "エラー：親ウィンドウが見つかりません。";
+            }
+            
+            // 確実に送信を完了させるために1秒待ってから閉じる
+            setTimeout(() => {
+              window.close();
+            }, 1000);
           })();
         </script>
       </body>
@@ -47,6 +60,6 @@ export async function GET({ url }) {
       headers: { 'Content-Type': 'text/html; charset=utf-8' }
     });
   } catch (e) {
-    return new Response("接続エラーが発生しました: " + e.message, { status: 500 });
+    return new Response("接続エラー: " + e.message, { status: 500 });
   }
 }
