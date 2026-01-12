@@ -1,12 +1,16 @@
 backend:
   name: github
-  repo: あなたのユーザー名/pjn-site # 自分の名前に書き換え！
+  # 1. あなたのGitHubユーザー名とリポジトリ名に書き換えてください
+  repo: tomohikohorai/pjn-site 
   branch: main
-  base_url: https://pjn-auth-gate.vercel.app # ログイン用の合鍵の場所
-  site_domain: あなたのサイト.vercel.app # 自分のサイトURL
+  # 2. あなたのVercelサイトのURL（末尾のスラッシュは不要）を書いてください
+  base_url: https://penan-japanese-news.vercel.app/
+  # 3. ログイン用の入り口（ステップ3で作ったAPI）の場所を指定します
+  auth_endpoint: api/auth 
 
-publish_mode: editorial_workflow # 下書き保存機能を使う設定
+publish_mode: editorial_workflow # 下書き保存・承認機能を使えるようにします
 
+# 記事の保存場所と入力項目の設定
 collections:
   - name: "posts"
     label: "記事一覧"
