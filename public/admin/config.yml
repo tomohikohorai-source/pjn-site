@@ -1,7 +1,7 @@
 backend:
   name: github
   # 1. あなたのGitHubユーザー名とリポジトリ名に書き換えてください
-  repo: tomohikohorai/pjn-site 
+  repo: tomohikohorai-source/pjn-site 
   branch: main
   # 2. あなたのVercelサイトのURL（末尾のスラッシュは不要）を書いてください
   base_url: https://penan-japanese-news.vercel.app/
