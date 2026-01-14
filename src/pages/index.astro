@@ -6,20 +6,12 @@ try {
     console.error("記事の読み込み失敗", e);
 }
 
-// ソートロジックの強化
 const sortedPosts = posts
     .filter(post => post && post.frontmatter && post.frontmatter.title)
     .sort((a, b) => {
-        // 1. 日付で比較（新しい順）
         const dateA = new Date(a.frontmatter.date || 0).getTime();
         const dateB = new Date(b.frontmatter.date || 0).getTime();
-        
-        if (dateB !== dateA) {
-            return dateB - dateA;
-        }
-        
-        // 2. 日付が同じ場合、ファイル名で比較（新しい順 = アルファベット逆順）
-        // 投稿順にファイル名をつけていれば、これで最新のビルド順が保たれます
+        if (dateB !== dateA) return dateB - dateA;
         return b.file.localeCompare(a.file);
     });
 
@@ -40,46 +32,35 @@ const tabList = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Penang Japanese News</title>
-    <!-- Pagefind UIの読み込み -->
     <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
     <style>
         :root { --pjn-red: #ce1126; --bg-color: #f4f6f8; --pagefind-ui-primary: #ce1126; }
-        body { font-family: -apple-system, "Helvetica Neue", sans-serif; margin: 0; background: var(--bg-color); color: #333; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-color); color: #333; }
         header { background: var(--pjn-red); color: white; padding: 1.1rem 0.5rem; text-align: center; position: sticky; top: 0; z-index: 1000; }
         header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; font-weight: bold; }
         .site-desc { font-size: 0.8rem; margin-top: 4px; opacity: 0.95; }
-
         .info-bar { background: #333; color: white; padding: 6px 10px; font-size: 0.75rem; display: flex; justify-content: center; position: sticky; top: 68px; z-index: 999; height: 20px; align-items: center;}
         .aqi-value { font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-left: 5px; }
-        .aqi-good { background: #009966; }
-        .aqi-moderate { background: #ffde33; color: #000; }
-        .aqi-unhealthy { background: #ff9933; }
-
+        .aqi-good { background: #009966; } .aqi-moderate { background: #ffde33; color: #000; } .aqi-unhealthy { background: #ff9933; }
         .nav-container { background: #fff; position: sticky; top: 104px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
         @media (min-width: 768px) { .nav-container { top: 130px; } .info-bar { top: 94px; } header h1 { font-size: 1.6rem; } }
-
         .nav-container::-webkit-scrollbar { display: none; }
         .nav-tabs { display: inline-flex; padding: 0 10px; margin: 0; list-style: none; }
         .tab-item { padding: 14px 20px; font-weight: bold; font-size: 0.9rem; color: #666; cursor: pointer; position: relative; }
         .tab-item.active { color: var(--pjn-red); border-bottom: 3px solid var(--pjn-red); }
-        
         main { padding: 10px; max-width: 1400px; margin: auto; }
         .news-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
         @media (max-width: 480px) { .news-grid { grid-template-columns: 1fr; } }
-
         #search-section { display: none; background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; min-height: 300px; }
-
         details { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; height: fit-content; }
         summary { padding: 18px; list-style: none; cursor: pointer; display: block; outline: none; }
         .card-meta { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .date { font-size: 0.7rem; color: #999; font-weight: bold; }
         .badge { font-size: 0.65rem; background: #f0f0f0; color: #555; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
         .new-badge { display: none; font-size: 0.7rem; background: #ff4757; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
-        
         .title { font-size: 1rem; font-weight: bold; line-height: 1.5; color: #111; display: block; }
         .content { padding: 0 18px 18px; border-top: 1px solid #f5f5f5; font-size: 0.95rem; line-height: 1.8; color: #444; }
         .hidden { display: none !important; }
-        
         :global(h3) { font-size: 1.05rem; color: var(--pjn-red); margin: 18px 0 10px; border-left: 4px solid var(--pjn-red); padding-left: 10px; }
         :global(.source-link) { display: inline-block; margin-top: 15px; font-size: 0.85rem; color: #005596; text-decoration: none; background: #f8f9fa; padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd; }
     </style>
@@ -104,7 +85,8 @@ const tabList = [
     <main>
         <section id="search-section"><div id="search-ui"></div></section>
 
-        <div class="news-grid" id="news-grid">
+        <!-- data-pagefind-ignore をつけることで、トップページの内容は検索対象から外します（重複回避） -->
+        <div class="news-grid" id="news-grid" data-pagefind-ignore>
             {sortedPosts.map(post => (
                 <details class="article-card" data-category={post.frontmatter.category} data-date={post.frontmatter.date}>
                     <summary>
@@ -115,8 +97,10 @@ const tabList = [
                         </div>
                         <span class="title">{post.frontmatter.title}</span>
                     </summary>
-                    <div class="content" data-pagefind-body>
+                    <div class="content">
                         <post.Content />
+                        <!-- 専用ページへのリンクも念のため設置 -->
+                        <a href={`/posts/${post.file.split('/').pop().replace('.md', '')}`} class="source-link" style="margin-top:20px; display:block; text-align:center;">この記事を単体ページで読む</a>
                     </div>
                 </details>
             ))}
