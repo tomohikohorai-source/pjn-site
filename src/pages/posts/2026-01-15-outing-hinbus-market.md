@@ -1,6 +1,6 @@
 ---
 title: "ジョージタウン『Hin Bus Depot』、今週末にアップサイクルをテーマにした家族向け市場を開催"
-date: "2026-01-15"
+date: "2026-01-14"
 category: "グルメ・店"
 ---
 <div class="genre-label">ジャンル：グルメ・店（おでかけ）</div>
