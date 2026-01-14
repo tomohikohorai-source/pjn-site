@@ -1,11 +1,6 @@
 import { defineConfig } from 'astro/config';
-import vercel from '@astrojs/vercel/serverless';
 
 export default defineConfig({
-  output: 'hybrid',
-  adapter: vercel({
-    webAnalytics: {
-      enabled: true,
-    },
-  }),
+  // 静的サイトとして出力（Pagefindを動かすために必須）
+  output: 'static',
 });
