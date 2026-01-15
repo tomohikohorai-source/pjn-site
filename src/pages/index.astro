@@ -1,11 +1,21 @@
 ---
-// --- 1. データの取得と準備 ---
+// --- 1. データの取得（ビルド時処理） ---
 let posts = [];
 try {
     posts = await Astro.glob('./posts/*.md');
 } catch (e) {
     console.error("記事の読み込み失敗", e);
 }
+
+// 全記事のソート（日付＋ビルド順）
+const allSortedPosts = posts
+    .filter(post => post && post.frontmatter && post.frontmatter.title)
+    .sort((a, b) => {
+        const dateA = new Date(a.frontmatter.date || 0).getTime();
+        const dateB = new Date(b.frontmatter.date || 0).getTime();
+        if (dateB !== dateA) return dateB - dateA;
+        return b.file.localeCompare(a.file);
+    });
 
 // ジャンル設定
 const tabList = [
@@ -20,7 +30,6 @@ const tabList = [
     { id: "survival", label: "便利リンク", color: "#444" }
 ];
 
-// サバイバルリンク
 const survivalLinks = [
     { label: "PBA通報", icon: "💧", url: "https://wa.me/6042558255" },
     { label: "緊急 999", icon: "🚨", url: "tel:999" },
@@ -31,16 +40,6 @@ const survivalLinks = [
     { label: "TNG", icon: "📱", url: "https://www.touchngo.com.my/" },
     { label: "Wise", icon: "💸", url: "https://wise.com/jp/" }
 ];
-
-// 全記事のソート（日付＋ビルド順）
-const allSortedPosts = posts
-    .filter(post => post && post.frontmatter && post.frontmatter.title)
-    .sort((a, b) => {
-        const dateA = new Date(a.frontmatter.date || 0).getTime();
-        const dateB = new Date(b.frontmatter.date || 0).getTime();
-        if (dateB !== dateA) return dateB - dateA;
-        return b.file.localeCompare(a.file);
-    });
 
 const novelPosts = allSortedPosts.filter(p => p.frontmatter.category === "PJN編集長 連載小説").reverse();
 
@@ -61,6 +60,8 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Penang Japanese News (PJN)</title>
+    
+    <!-- SEOメタタグ -->
     <meta name="description" content="ペナンの一次情報を精査。断水、治安、教育、ビザ、グルメなど、在住日本人に必要な情報を毎日日本語でお届けします。" />
     <meta property="og:title" content="Penang Japanese News (PJN)" />
     <meta property="og:description" content="ペナン在住日本人のための生活・教育・安全ファクトメディア。" />
@@ -118,7 +119,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         .share-box { margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ddd; display: flex; gap: 10px; }
         .share-btn { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; color: white; text-decoration: none; border: none; }
         .btn-wa { background: #25D366; } .btn-line { background: #06C755; } .btn-copy { background: #666; }
-        #back-to-top { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--theme-color); color: white; border-radius: 50%; border: none; display: none; align-items: center; justify-content: center; z-index: 1500; font-size: 24px; cursor: pointer;}
+        #back-to-top { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--theme-color); color: white; border-radius: 50%; border: none; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 1500; font-size: 24px; cursor: pointer;}
     </style>
 </head>
 <body>
@@ -201,8 +202,10 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
 
     <script is:inline>
-        // 1. フレーズデータ（JS内に直接持つことで読み込みエラーを完全に防止）
-        const phrases = [
+        // ---------------------------------------------------------
+        // 1. データの定義（スクリプト内に直接保持して読み込みを100%保証）
+        // ---------------------------------------------------------
+        var phrases = [
             { q: "注文時に「お持ち帰り」と言いたい時は？", a: "Tapau（タパオ）", n: "広東語由来。マレーシア全土で必須。" },
             { q: "「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong", n: "Oは砂糖入り、Kosongは無を意味します。" },
             { q: "店員さんを呼ぶ時の便利な愛称は？", a: "Boss（ボス）", n: "男性店員にはBoss!と呼ぶのがペナン流。" },
@@ -236,28 +239,27 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
             { q: "「何？」は？", a: "Apa?", n: "聞き取れなかった時に聞き返します。" }
         ];
 
+        // ---------------------------------------------------------
+        // 2. 基本機能の定義 (windowに即時登録)
+        // ---------------------------------------------------------
+        
         window.loadDailyPhrase = function() {
             var day = new Date().getDate();
             var p = phrases[(day - 1) % phrases.length];
-            document.getElementById('phrase-q').innerText = p.q;
-            document.getElementById('phrase-a').innerText = p.a;
-            document.getElementById('phrase-note').innerText = p.n;
+            var qEl = document.getElementById('phrase-q');
+            var aEl = document.getElementById('phrase-a');
+            var nEl = document.getElementById('phrase-note');
+            if (qEl) qEl.innerText = p.q;
+            if (aEl) aEl.innerText = p.a;
+            if (nEl) nEl.innerText = p.n;
         };
 
         window.showPhraseAnswer = function() {
-            document.getElementById('phrase-ans-area').style.display = 'block';
-            document.getElementById('phrase-btn').style.display = 'none';
+            var ans = document.getElementById('phrase-ans-area');
+            var btn = document.getElementById('phrase-btn');
+            if (ans) ans.style.display = 'block';
+            if (btn) btn.style.display = 'none';
         };
 
         window.initTabs = function() {
-            var tabs = document.querySelectorAll('.tab-item');
-            var articles = document.querySelectorAll('.article-card');
-            var newsGrid = document.getElementById('news-grid');
-            var survivalSec = document.getElementById('survival-section');
-            var phraseSec = document.getElementById('daily-phrase-section');
-
-            for (var i = 0; i < tabs.length; i++) {
-                tabs[i].onclick = function() {
-                    var color = this.getAttribute('data-color');
-                    var target = this.getAttribute('data-target');
-                    document.documentElement.style.setProperty('--theme-color', color
+            var tabs = document.query
