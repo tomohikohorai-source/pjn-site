@@ -20,6 +20,41 @@ const tabList = [
     { id: "survival", label: "便利リンク", color: "#444" }
 ];
 
+// 【完全版】31日分の日替わりサバイバル語学（マレー語＆マングリッシュ）
+const dailyPhrases = [
+    { q: "1日: 注文時に「お持ち帰り」と言いたい時は？", a: "Tapau（タパオ）", note: "広東語由来ですが、マレーシア全土で通じる超必須単語です。" },
+    { q: "2日: 「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong（コピ・オー・コソン）", note: "Oは砂糖入り、Kosongは「ゼロ（無）」を意味します。" },
+    { q: "3日: 店員さんを呼ぶ時の便利な愛称は？", a: "Boss（ボス）", note: "年齢を問わず、男性店員さんには「Boss!」と呼ぶのがペナン流。" },
+    { q: "4日: 「ここで降ろして」とGrabで伝える時は？", a: "Sini saja（シニ・サジャ）", note: "「ここでいいよ（Here only）」という意味で非常に通じやすいです。" },
+    { q: "5日: 「いくらですか？」と値段を聞く時は？", a: "Berapa?（ブラパ？）", note: "ショッピングや屋台で大活躍します。Berapa harga?の略です。" },
+    { q: "6日: マングリッシュの定番「Can lah（キャン・ラー）」の意味は？", a: "「できるよ！」「いいよ！」", note: "マレーシアで最も耳にする肯定の表現です。語尾のLahは強調。" },
+    { q: "7日: 「ありがとう」はマレー語で？", a: "Terima Kasih（トゥリマ・カシ）", note: "笑顔で言うと、ホーカーのおじちゃんも喜びます。" },
+    { q: "8日: 「美味しい！」と伝えたい時は？", a: "Sedap（スダッ！）", note: "「Sedap gila!（スダッ・ギラ！）」と言うと「めちゃくちゃ旨い！」というニュアンスに。" },
+    { q: "9日: お会計をお願いする時のマングリッシュは？", a: "Bill, please / Check, please", note: "マレー語では「Kira（キラ）」と言いますが、英語もよく通じます。" },
+    { q: "10日: 「少しだけ」と言いたい時は？", a: "Sikit（シキッ）", note: "辛さを控えめにしてほしい時などに「Sikit saja」と使います。" },
+    { q: "11日: 「はい」と「いいえ」は？", a: "Ya（ヤ） / Tidak（ティダッ）", note: "Tidakは会話では短く「Tak（タッ）」と言われることが多いです。" },
+    { q: "12日: 「飲み物は店内で」と言いたい時は？", a: "Minum（ミヌム）", note: "店員さんが「Drink?」と聞いてきたら「Minum」で店内、「Tapau」で持ち帰り。" },
+    { q: "13日: 飲み物の注文で「砂糖控えめ」は？", a: "Kurang Manis（クラン・マニス）", note: "マレーシアの飲み物は標準だと激甘なので、日本人はこの魔法の言葉を覚えましょう。" },
+    { q: "14日: 「欲しい（want）」は？", a: "Nak（ナッ）", note: "「Nak Tapau（持ち帰りたい）」のように、動詞の前に付けて使えます。" },
+    { q: "15日: 「これ（This）」は？", a: "Ini（イニ）", note: "指差しながら「Ini satu（これ1つ）」と言うだけで注文完了です。" },
+    { q: "16日: 「ある（Have）」は？", a: "Ada（アダ）", note: "在庫を聞く時に便利。「Ada Stock?（在庫ある？）」のように使います。" },
+    { q: "17日: 「ない（No have）」は？", a: "Tak ada（タ・アダ）", note: "店員さんに「Habis（ハビス＝売り切れ）」と言われたら「Tak ada」と同じ意味です。" },
+    { q: "18日: 「辛い」は？", a: "Pedas（プダス）", note: "「Tak Nak Pedas（辛くしないで）」は、お子様連れには必須の呪文です。" },
+    { q: "19日: 年上の女性店員さんへの親しみを込めた呼び方は？", a: "Kakak（カカッ）", note: "お姉さん、という意味。略して「Kak!」と呼ぶのが一般的です。" },
+    { q: "20日: 「まだ（Not yet）」は？", a: "Belum（ブルム）", note: "料理が来ない時に「Belum sampai（まだ届いてない）」と使えます。" },
+    { q: "21日: 「トイレはどこ？」は？", a: "Tandas kat mana?（タンダス・カッ・マナ？）", note: "Tandas = トイレ、Mana = どこ。緊急時に役立ちます。" },
+    { q: "22日: 「（値段が）高い」は？", a: "Mahal（マハル）", note: "観光地で「Mahal lah!（高いよ〜）」と冗談ぽく言うと負けてくれるかも？" },
+    { q: "23日: 「安い」は？", a: "Murah（ムラ）", note: "「Very murah!」と褒めると喜ばれます。" },
+    { q: "24日: 数字の「1、2、3」は？", a: "Satu, Dua, Tiga（サトゥ、ドゥア、ティガ）", note: "注文個数を伝える時にこれだけ知っていると重宝します。" },
+    { q: "25日: 「さあ行こう！」「やろう！」は？", a: "Jom!（ジョム！）", note: "「Jom Makan!（ご飯行こう！）」のように、仲間を誘う時に使います。" },
+    { q: "26日: 「上」と「下」は？", a: "Atas（アタス） / Bawah（バワ）", note: "「Floor Atas（上の階）」など、場所の説明に使います。" },
+    { q: "27日: 「おはよう」は？", a: "Selamat Pagi（スラマッ・パギ）", note: "コンドのセキュリティの人に挨拶すると、防犯意識が高まります。" },
+    { q: "28日: 「ごめんなさい（すみません）」は？", a: "Minta Maaf（ミンタ・マアフ）", note: "誰かとぶつかった時などにサッと言えるとスマートです。" },
+    { q: "29日: 「左」と「右」は？", a: "Kiri（キリ） / Kanan（カナン）", note: "Grabの道案内で「Kiri, Boss!（左だよ、ボス！）」と使えます。" },
+    { q: "30日: 「まっすぐ」は？", a: "Terus（トゥルス）", note: "「Jalan Terus」で「真っ直ぐ進んで」となります。" },
+    { q: "31日: 「何？」と聞く時は？", a: "Apa?（アパ？）", note: "聞き取れなかった時に「Apa?」と聞き返します。" }
+];
+
 const survivalLinks = [
     { label: "PBA通報", icon: "💧", url: "https://wa.me/6042558255" },
     { label: "緊急 999", icon: "🚨", url: "tel:999" },
@@ -31,7 +66,6 @@ const survivalLinks = [
     { label: "Wise", icon: "💸", url: "https://wise.com/jp/" }
 ];
 
-// 全記事のソート（日付＋ビルド順）
 const allSortedPosts = posts
     .filter(post => post && post.frontmatter && post.frontmatter.title)
     .sort((a, b) => {
@@ -41,10 +75,7 @@ const allSortedPosts = posts
         return b.file.localeCompare(a.file);
     });
 
-// 小説のリスト
-const novelPosts = allSortedPosts
-    .filter(p => p.frontmatter.category === "PJN編集長 連載小説")
-    .reverse();
+const novelPosts = allSortedPosts.filter(p => p.frontmatter.category === "PJN編集長 連載小説").reverse();
 
 const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     const slug = post.file.split('/').pop().replace('.md', '');
@@ -78,16 +109,10 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         #reading-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: transparent; z-index: 2000; }
         #reading-progress-bar { height: 100%; width: 0%; background: #ffde33; transition: width 0.1s ease; }
 
-        /* インフォバーの調整 */
         .info-bar { background: #333; color: white; padding: 6px 12px; font-size: 0.75rem; display: flex; justify-content: space-between; position: sticky; top: 68px; z-index: 999; min-height: 28px; align-items: center;}
-        
-        /* AQIスタイルの詳細化 */
         .aqi-container { display: flex; align-items: center; gap: 5px; }
-        .aqi-label { color: #ccc; font-size: 0.7rem; }
-        .aqi-value { font-weight: bold; padding: 2px 8px; border-radius: 4px; display: inline-block; color: white; }
-        .aqi-good { background: #009966; }
-        .aqi-moderate { background: #d4af37; color: #000; }
-        .aqi-unhealthy { background: #ce1126; }
+        .aqi-value { font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; }
+        .aqi-good { background: #009966; } .aqi-moderate { background: #d4af37; color: #000; } .aqi-unhealthy { background: #ce1126; }
         
         .font-sizer { display: flex; gap: 5px; align-items: center; }
         .font-sizer button { background: #555; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; }
@@ -95,7 +120,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
 
         .nav-container { background: #fff; position: sticky; top: 104px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
         @media (min-width: 768px) { .nav-container { top: 133px; } .info-bar { top: 94px; } header h1 { font-size: 1.6rem; } }
-
         .nav-container::-webkit-scrollbar { display: none; }
         .nav-tabs { display: inline-flex; padding: 0 10px; margin: 0; list-style: none; }
         .tab-item { padding: 14px 20px; font-weight: bold; font-size: 0.9rem; color: #666; cursor: pointer; position: relative; transition: color 0.3s; }
@@ -103,10 +127,18 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         
         main { padding: 10px; max-width: 1400px; margin: auto; }
         
-        #survival-section { display: none; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .survival-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        #daily-phrase-section { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid #00843d; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .phrase-header { font-size: 0.65rem; font-weight: bold; color: #00843d; text-transform: uppercase; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .phrase-q { font-size: 0.95rem; font-weight: bold; color: #111; margin-bottom: 8px; line-height: 1.4; }
+        .phrase-a-box { display: none; background: #f0f9f4; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .phrase-a { font-size: 1.1rem; color: #ce1126; font-weight: 900; margin-bottom: 5px; }
+        .phrase-note { font-size: 0.8rem; color: #555; line-height: 1.5; }
+        .phrase-btn { background: #00843d; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+
+        #survival-section { display: none; }
+        .survival-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         @media (min-width: 600px) { .survival-grid { grid-template-columns: repeat(4, 1fr); } }
-        .survival-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #333; padding: 15px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; }
+        .survival-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #333; padding: 15px; border: 1px solid #eee; border-radius: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .survival-icon { font-size: 1.8rem; margin-bottom: 5px; }
         .survival-label { font-size: 0.8rem; font-weight: bold; }
 
@@ -143,7 +175,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         <p class="site-desc">ペナン現地ニュースを厳選、毎日日本語で更新</p>
     </header>
 
-    <!-- 改良版：大気質インフォバー -->
     <div class="info-bar">
         <div class="aqi-container" id="pjn-aqi-area">
             <span class="aqi-label">ペナン空気の状態:</span>
@@ -152,7 +183,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         <div class="font-sizer">
             <span style="font-size:0.6rem;margin-right:3px;">文字サイズ</span>
             <button id="btn-small" onclick="changeFontSize('small', this)">小</button>
-            <button id="btn-medium" class="active" onclick="changeFontSize('medium', this)">中</button>
+            <button id="btn-medium" onclick="changeFontSize('medium', this)">中</button>
             <button id="btn-large" onclick="changeFontSize('large', this)">大</button>
         </div>
     </div>
@@ -165,6 +196,17 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         </ul>
     </nav>
     <main>
+        <!-- デイリーフレーズ・セクション -->
+        <section id="daily-phrase-section">
+            <div class="phrase-header">🇲🇾 今日のサバイバル語学</div>
+            <div class="phrase-q" id="phrase-q">取得中...</div>
+            <button class="phrase-btn" id="phrase-btn" onclick="showPhraseAnswer()">意味を見る</button>
+            <div class="phrase-a-box" id="phrase-ans-area">
+                <div class="phrase-a" id="phrase-a">答え</div>
+                <div class="phrase-note" id="phrase-note">解説</div>
+            </div>
+        </section>
+
         <section id="survival-section">
             <div class="survival-grid">
                 {survivalLinks.map(link => (
@@ -207,12 +249,27 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     </main>
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
 
-    <script is:inline>
+    <script is:inline define:vars={{ dailyPhrases }}>
+        // --- 1. デイリーフレーズ・ロジック ---
+        function loadDailyPhrase() {
+            const day = new Date().getDate(); // 1-31
+            const phrase = dailyPhrases[(day - 1) % dailyPhrases.length];
+            document.getElementById('phrase-q').innerText = phrase.q;
+            document.getElementById('phrase-a').innerText = phrase.a;
+            document.getElementById('phrase-note').innerText = phrase.note;
+        }
+        function showPhraseAnswer() {
+            document.getElementById('phrase-ans-area').style.display = 'block';
+            document.getElementById('phrase-btn').style.display = 'none';
+        }
+
+        // --- 2. タブ・カテゴリロジック ---
         function initTabs() {
             var tabs = document.querySelectorAll('.tab-item');
             var articles = document.querySelectorAll('.article-card');
             var newsGrid = document.getElementById('news-grid');
             var survivalSection = document.getElementById('survival-section');
+            var phraseSection = document.getElementById('daily-phrase-section');
 
             for (var i = 0; i < tabs.length; i++) {
                 tabs[i].onclick = function() {
@@ -223,12 +280,11 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                     this.classList.add('active');
                     this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
-                    if (target === 'survival') {
-                        newsGrid.style.display = 'none';
-                        survivalSection.style.display = 'block';
-                    } else {
-                        newsGrid.style.display = 'grid';
-                        survivalSection.style.display = 'none';
+                    phraseSection.style.display = (target === 'all') ? 'block' : 'none';
+                    newsGrid.style.display = (target === 'survival') ? 'none' : 'grid';
+                    survivalSection.style.display = (target === 'survival') ? 'block' : 'none';
+
+                    if (target !== 'survival') {
                         for (var k = 0; k < articles.length; k++) {
                             var cat = articles[k].getAttribute('data-category');
                             if (target === 'all' || cat === target) articles[k].classList.remove('hidden');
@@ -239,6 +295,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
             }
         }
 
+        // --- 3. NEWバッジ判定 ---
         function initNewBadges() {
             var now = new Date();
             var articles = document.querySelectorAll('.article-card');
@@ -250,6 +307,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
             }
         }
 
+        // --- 4. スクロールエフェクト ---
         function initScrollEffects() {
             var bar = document.getElementById('reading-progress-bar');
             var btn = document.getElementById('back-to-top');
@@ -261,6 +319,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
             };
         }
 
+        // --- 5. 大気質(AQI)取得 ---
         function initAQI() {
             var el = document.getElementById('pjn-aqi-status');
             fetch('https://api.waqi.info/feed/penang/?token=demo')
@@ -271,23 +330,21 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                         var txt = aqi > 100 ? '注意' : (aqi > 50 ? '普通' : '良好');
                         el.innerHTML = '<span class="aqi-value ' + cls + '">' + aqi + ' (' + txt + ')</span>';
                     }
-                })
-                .catch(() => { el.innerText = "オフライン"; });
+                });
         }
 
-        function copyLink(slug) {
+        // --- 6. 便利機能 ---
+        window.copyLink = function(slug) {
             var url = "https://penan-japanese-news.vercel.app/posts/" + slug;
             navigator.clipboard.writeText(url).then(() => alert("リンクをコピーしました！"));
         }
-
-        function changeFontSize(size, btn) {
+        window.changeFontSize = function(size, btn) {
             document.body.className = 'font-' + size;
             document.querySelectorAll('.font-sizer button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             localStorage.setItem('pjn-font-size', size);
         }
-
-        function openArticle(slug) {
+        window.openArticle = function(slug) {
             const card = document.querySelector('[data-slug="' + slug + '"]');
             if (card) {
                 document.querySelectorAll('details').forEach(d => d.open = false);
@@ -300,11 +357,10 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         const savedFontSize = localStorage.getItem('pjn-font-size') || 'medium';
         document.body.className = 'font-' + savedFontSize;
         document.querySelectorAll('.font-sizer button').forEach(b => {
-            b.classList.remove('active');
             if (b.id === 'btn-' + savedFontSize) b.classList.add('active');
         });
 
-        initTabs(); initNewBadges(); initScrollEffects(); initAQI();
+        initTabs(); initNewBadges(); initScrollEffects(); initAQI(); loadDailyPhrase();
     </script>
 </body>
 </html>
