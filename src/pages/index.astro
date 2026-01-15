@@ -7,7 +7,7 @@ try {
     console.error("記事の読み込み失敗", e);
 }
 
-// ジャンル設定（便利リンクを最後尾へ移動）
+// ジャンル設定
 const tabList = [
     { id: "all", label: "トピック", color: "#ce1126" },
     { id: "重要・安全", label: "重要・安全", color: "#ce1126" },
@@ -31,6 +31,7 @@ const survivalLinks = [
     { label: "Wise", icon: "💸", url: "https://wise.com/jp/" }
 ];
 
+// 全記事のソート（日付＋ビルド順）
 const allSortedPosts = posts
     .filter(post => post && post.frontmatter && post.frontmatter.title)
     .sort((a, b) => {
@@ -40,6 +41,7 @@ const allSortedPosts = posts
         return b.file.localeCompare(a.file);
     });
 
+// 小説のリスト
 const novelPosts = allSortedPosts
     .filter(p => p.frontmatter.category === "PJN編集長 連載小説")
     .reverse();
@@ -65,7 +67,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         :root { --pjn-red: var(--initialColor); --bg-color: #f4f6f8; --theme-color: var(--initialColor); --article-font-size: 0.95rem; }
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-color); color: #333; transition: font-size 0.2s; }
         
-        /* 文字サイズ変更クラス */
         body.font-small { --article-font-size: 0.85rem; }
         body.font-medium { --article-font-size: 1rem; }
         body.font-large { --article-font-size: 1.2rem; }
@@ -77,16 +78,22 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         #reading-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: transparent; z-index: 2000; }
         #reading-progress-bar { height: 100%; width: 0%; background: #ffde33; transition: width 0.1s ease; }
 
-        .info-bar { background: #333; color: white; padding: 6px 10px; font-size: 0.75rem; display: flex; justify-content: space-between; position: sticky; top: 68px; z-index: 999; height: 25px; align-items: center;}
-        .aqi-value { font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-left: 5px; }
-        .aqi-good { background: #009966; } .aqi-moderate { background: #ffde33; color: #000; } .aqi-unhealthy { background: #ff9933; }
+        /* インフォバーの調整 */
+        .info-bar { background: #333; color: white; padding: 6px 12px; font-size: 0.75rem; display: flex; justify-content: space-between; position: sticky; top: 68px; z-index: 999; min-height: 28px; align-items: center;}
         
-        /* 文字サイズコントローラー */
+        /* AQIスタイルの詳細化 */
+        .aqi-container { display: flex; align-items: center; gap: 5px; }
+        .aqi-label { color: #ccc; font-size: 0.7rem; }
+        .aqi-value { font-weight: bold; padding: 2px 8px; border-radius: 4px; display: inline-block; color: white; }
+        .aqi-good { background: #009966; }
+        .aqi-moderate { background: #d4af37; color: #000; }
+        .aqi-unhealthy { background: #ce1126; }
+        
         .font-sizer { display: flex; gap: 5px; align-items: center; }
         .font-sizer button { background: #555; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; }
         .font-sizer button.active { background: var(--pjn-red); font-weight: bold; }
 
-        .nav-container { background: #fff; position: sticky; top: 108px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .nav-container { background: #fff; position: sticky; top: 104px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
         @media (min-width: 768px) { .nav-container { top: 133px; } .info-bar { top: 94px; } header h1 { font-size: 1.6rem; } }
 
         .nav-container::-webkit-scrollbar { display: none; }
@@ -136,13 +143,17 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         <p class="site-desc">ペナン現地ニュースを厳選、毎日日本語で更新</p>
     </header>
 
+    <!-- 改良版：大気質インフォバー -->
     <div class="info-bar">
-        <span id="pjn-aqi">AQI: 取得中...</span>
+        <div class="aqi-container" id="pjn-aqi-area">
+            <span class="aqi-label">ペナン空気の状態:</span>
+            <span id="pjn-aqi-status">取得中...</span>
+        </div>
         <div class="font-sizer">
             <span style="font-size:0.6rem;margin-right:3px;">文字サイズ</span>
-            <button onclick="changeFontSize('small', this)">小</button>
-            <button class="active" onclick="changeFontSize('medium', this)">中</button>
-            <button onclick="changeFontSize('large', this)">大</button>
+            <button id="btn-small" onclick="changeFontSize('small', this)">小</button>
+            <button id="btn-medium" class="active" onclick="changeFontSize('medium', this)">中</button>
+            <button id="btn-large" onclick="changeFontSize('large', this)">大</button>
         </div>
     </div>
 
@@ -227,6 +238,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 };
             }
         }
+
         function initNewBadges() {
             var now = new Date();
             var articles = document.querySelectorAll('.article-card');
@@ -237,6 +249,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 if ((now - pubDate) / 3600000 < 24) articles[i].querySelector('.new-badge').style.display = 'inline-block';
             }
         }
+
         function initScrollEffects() {
             var bar = document.getElementById('reading-progress-bar');
             var btn = document.getElementById('back-to-top');
@@ -247,27 +260,33 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 btn.style.display = top > 300 ? "flex" : "none";
             };
         }
+
         function initAQI() {
-            var el = document.getElementById('pjn-aqi');
+            var el = document.getElementById('pjn-aqi-status');
             fetch('https://api.waqi.info/feed/penang/?token=demo')
                 .then(res => res.json()).then(json => {
                     if (json.status === 'ok') {
                         var aqi = json.data.aqi;
                         var cls = aqi > 100 ? 'aqi-unhealthy' : (aqi > 50 ? 'aqi-moderate' : 'aqi-good');
-                        el.innerHTML = 'ペナンAQI: <span class="aqi-value ' + cls + '">' + aqi + '</span>';
+                        var txt = aqi > 100 ? '注意' : (aqi > 50 ? '普通' : '良好');
+                        el.innerHTML = '<span class="aqi-value ' + cls + '">' + aqi + ' (' + txt + ')</span>';
                     }
-                });
+                })
+                .catch(() => { el.innerText = "オフライン"; });
         }
+
         function copyLink(slug) {
             var url = "https://penan-japanese-news.vercel.app/posts/" + slug;
             navigator.clipboard.writeText(url).then(() => alert("リンクをコピーしました！"));
         }
+
         function changeFontSize(size, btn) {
             document.body.className = 'font-' + size;
             document.querySelectorAll('.font-sizer button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             localStorage.setItem('pjn-font-size', size);
         }
+
         function openArticle(slug) {
             const card = document.querySelector('[data-slug="' + slug + '"]');
             if (card) {
@@ -276,15 +295,15 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 card.scrollIntoView({ behavior: 'smooth' });
             }
         }
-        // フォントサイズの復元
-        const savedFontSize = localStorage.getItem('pjn-font-size');
-        if (savedFontSize) {
-            document.body.className = 'font-' + savedFontSize;
-            document.querySelectorAll('.font-sizer button').forEach(b => {
-                if(b.innerText === (savedFontSize === 'small' ? '小' : savedFontSize === 'medium' ? '中' : '大')) b.classList.add('active');
-                else b.classList.remove('active');
-            });
-        }
+
+        // 初期復元
+        const savedFontSize = localStorage.getItem('pjn-font-size') || 'medium';
+        document.body.className = 'font-' + savedFontSize;
+        document.querySelectorAll('.font-sizer button').forEach(b => {
+            b.classList.remove('active');
+            if (b.id === 'btn-' + savedFontSize) b.classList.add('active');
+        });
+
         initTabs(); initNewBadges(); initScrollEffects(); initAQI();
     </script>
 </body>
