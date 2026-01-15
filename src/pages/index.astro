@@ -15,7 +15,6 @@ const sortedPosts = posts
         return b.file.localeCompare(a.file);
     });
 
-// 【新設】サバイバルリンクのデータ
 const survivalLinks = [
     { label: "PBA通報", icon: "💧", url: "https://wa.me/6042558255" },
     { label: "緊急 999", icon: "🚨", url: "tel:999" },
@@ -29,6 +28,7 @@ const survivalLinks = [
 
 const tabList = [
     { id: "all", label: "トピック", color: "#ce1126" },
+    { id: "survival", label: "便利リンク", color: "#444" }, // 便利リンク専用タブ
     { id: "重要・安全", label: "重要・安全", color: "#ce1126" },
     { id: "教育・学校", label: "教育・学校", color: "#005596" },
     { id: "ビザ・生活行政", label: "ビザ・行政", color: "#2e7d32" },
@@ -38,16 +38,12 @@ const tabList = [
     { id: "PJN編集長 連載小説", label: "連載小説", color: "#6a1b9a" }
 ];
 
-// 小説の前後リンク計算用
-const novelPosts = sortedPosts
-    .filter(p => p.frontmatter.category === "PJN編集長 連載小説")
-    .reverse();
+const novelPosts = sortedPosts.filter(p => p.frontmatter.category === "PJN編集長 連載小説").reverse();
 
 const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
     const slug = post.file.split('/').pop().replace('.md', '');
     const isNovel = post.frontmatter.category === "PJN編集長 連載小説";
-    let prevSlug = null;
-    let nextSlug = null;
+    let prevSlug = null; let nextSlug = null;
     if (isNovel) {
         const nIndex = novelPosts.findIndex(p => p.file === post.file);
         if (nIndex > 0) prevSlug = novelPosts[nIndex - 1].file.split('/').pop().replace('.md', '');
@@ -69,13 +65,6 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; font-weight: bold; }
         .site-desc { font-size: 0.8rem; margin-top: 4px; opacity: 0.95; }
 
-        /* サバイバルリンク・セクション */
-        .survival-container { background: #fff; padding: 10px; border-bottom: 1px solid #ddd; }
-        .survival-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 1400px; margin: auto; }
-        .survival-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #333; }
-        .survival-icon { font-size: 1.2rem; margin-bottom: 2px; }
-        .survival-label { font-size: 0.65rem; font-weight: bold; color: #666; text-align: center; }
-
         .info-bar { background: #333; color: white; padding: 6px 10px; font-size: 0.75rem; display: flex; justify-content: center; position: sticky; top: 68px; z-index: 999; height: 20px; align-items: center;}
         .aqi-value { font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-left: 5px; }
         .aqi-good { background: #009966; } .aqi-moderate { background: #ffde33; color: #000; } .aqi-unhealthy { background: #ff9933; }
@@ -89,11 +78,20 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         .tab-item.active { color: var(--theme-color); border-bottom: 3px solid var(--theme-color); }
         
         main { padding: 10px; max-width: 1400px; margin: auto; }
+
+        /* 便利リンク・セクション（特定の時だけ表示） */
+        #survival-section { display: none; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .survival-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        @media (min-width: 600px) { .survival-grid { grid-template-columns: repeat(4, 1fr); } }
+        .survival-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #333; padding: 15px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; }
+        .survival-icon { font-size: 1.8rem; margin-bottom: 5px; }
+        .survival-label { font-size: 0.8rem; font-weight: bold; }
+
         .news-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
         @media (max-width: 480px) { .news-grid { grid-template-columns: 1fr; } }
         @media (min-width: 1200px) { details[open] { grid-column: span 2; } }
 
-        details { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; height: fit-content; transition: 0.2s; }
+        details { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #eee; height: fit-content; }
         summary { padding: 18px; list-style: none; cursor: pointer; display: block; outline: none; }
         summary::-webkit-details-marker { display: none; }
         .card-meta { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
@@ -104,10 +102,9 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         .content { padding: 0 18px 18px; border-top: 1px solid #f5f5f5; font-size: 0.95rem; line-height: 1.8; color: #444; }
         .hidden { display: none !important; }
         
-        .share-box { margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ddd; display: flex; gap: 10px; flex-wrap: wrap; }
+        .share-box { margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ddd; display: flex; gap: 10px; }
         .share-btn { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-decoration: none; color: white; cursor: pointer; border: none; }
         .btn-wa { background: #25D366; } .btn-line { background: #06C755; } .btn-copy { background: #666; }
-
         .novel-nav { margin-top: 20px; padding: 15px; background: #f9f0ff; border-radius: 8px; display: flex; justify-content: space-between; font-size: 0.85rem; border: 1px solid #e1bee7; }
         .novel-nav button { background: none; border: none; color: #6a1b9a; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
 
@@ -125,18 +122,6 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         <p class="site-desc">ペナン現地ニュースを厳選、毎日日本語で更新</p>
     </header>
 
-    <!-- 【新設】サバイバルリンク -->
-    <div class="survival-container">
-        <div class="survival-grid">
-            {survivalLinks.map(link => (
-                <a href={link.url} target="_blank" class="survival-item">
-                    <span class="survival-icon">{link.icon}</span>
-                    <span class="survival-label">{link.label}</span>
-                </a>
-            ))}
-        </div>
-    </div>
-
     <div class="info-bar"><span id="pjn-aqi">ペナン空気指数(AQI): 取得中...</span></div>
 
     <nav class="nav-container">
@@ -147,6 +132,19 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         </ul>
     </nav>
     <main>
+        <!-- 便利リンクセクション（初期は非表示） -->
+        <section id="survival-section">
+            <div class="survival-grid">
+                {survivalLinks.map(link => (
+                    <a href={link.url} target="_blank" class="survival-item">
+                        <span class="survival-icon">{link.icon}</span>
+                        <span class="survival-label">{link.label}</span>
+                    </a>
+                ))}
+            </div>
+        </section>
+
+        <!-- ニュースグリッド -->
         <div class="news-grid" id="news-grid">
             {processedPosts.map((post) => (
                 <details class="article-card" data-category={post.frontmatter.category} data-date={post.frontmatter.date} data-slug={post.slug}>
@@ -182,18 +180,29 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         function initTabs() {
             var tabs = document.querySelectorAll('.tab-item');
             var articles = document.querySelectorAll('.article-card');
+            var newsGrid = document.getElementById('news-grid');
+            var survivalSection = document.getElementById('survival-section');
+
             for (var i = 0; i < tabs.length; i++) {
                 tabs[i].onclick = function() {
                     var color = this.getAttribute('data-color');
+                    var target = this.getAttribute('data-target');
                     document.documentElement.style.setProperty('--theme-color', color);
                     for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
                     this.classList.add('active');
-                    var target = this.getAttribute('data-target');
                     this.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                    for (var k = 0; k < articles.length; k++) {
-                        var cat = articles[k].getAttribute('data-category');
-                        if (target === 'all' || cat === target) articles[k].classList.remove('hidden');
-                        else articles[k].classList.add('hidden');
+
+                    if (target === 'survival') {
+                        newsGrid.style.display = 'none';
+                        survivalSection.style.display = 'block';
+                    } else {
+                        newsGrid.style.display = 'grid';
+                        survivalSection.style.display = 'none';
+                        for (var k = 0; k < articles.length; k++) {
+                            var cat = articles[k].getAttribute('data-category');
+                            if (target === 'all' || cat === target) articles[k].classList.remove('hidden');
+                            else articles[k].classList.add('hidden');
+                        }
                     }
                 };
             }
