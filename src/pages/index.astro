@@ -1,5 +1,5 @@
 ---
-// --- 1. データの取得（ビルド時） ---
+// --- 1. データの取得 ---
 let posts = [];
 try {
     posts = await Astro.glob('./posts/*.md');
@@ -7,6 +7,7 @@ try {
     console.error("記事の読み込み失敗");
 }
 
+// ジャンル設定
 const tabList = [
     { id: "all", label: "トピック", color: "#ce1126" },
     { id: "重要・安全", label: "重要・安全", color: "#ce1126" },
@@ -30,6 +31,7 @@ const survivalLinks = [
     { label: "Wise", icon: "💸", url: "https://wise.com/jp/" }
 ];
 
+// ソート（日付＋ファイル名順）
 const allSortedPosts = posts
     .filter(post => post && post.frontmatter && post.frontmatter.title)
     .sort((a, b) => {
@@ -58,15 +60,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Penang Japanese News (PJN)</title>
-    
-    <!-- SEOメタタグ -->
-    <meta name="description" content="ペナンの一次情報を精査。断水、治安、教育、ビザ、グルメなど、在住日本人に必要な情報を毎日日本語でお届けします。" />
-    <meta property="og:title" content="Penang Japanese News (PJN)" />
-    <meta property="og:description" content="ペナン在住日本人のための生活・教育・安全ファクトメディア。" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://penan-japanese-news.vercel.app" />
-    <meta name="twitter:card" content="summary" />
-
     <style define:vars={{ initialColor: tabList[0].color }}>
         :root { --pjn-red: var(--initialColor); --bg-color: #f4f6f8; --theme-color: var(--initialColor); --article-font-size: 0.95rem; }
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-color); color: #333; transition: font-size 0.2s; }
@@ -117,7 +110,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         .share-box { margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ddd; display: flex; gap: 10px; }
         .share-btn { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; color: white; text-decoration: none; border: none; cursor: pointer;}
         .btn-wa { background: #25D366; } .btn-line { background: #06C755; } .btn-copy { background: #666; }
-        #back-to-top { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--theme-color); color: white; border-radius: 50%; border: none; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 1500; font-size: 24px; }
+        #back-to-top { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--theme-color); color: white; border-radius: 50%; border: none; display: none; align-items: center; justify-content: center; z-index: 1500; font-size: 24px; cursor: pointer;}
     </style>
 </head>
 <body>
@@ -200,7 +193,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
 
     <script is:inline>
-        // データセット
         var phrases = [
             { q: "注文時に「お持ち帰り」と言いたい時は？", a: "Tapau（タパオ）", n: "広東語由来。マレーシア全土で必須。" },
             { q: "「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong", n: "Oは砂糖入り、Kosongは無を意味します。" },
@@ -234,8 +226,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
             { q: "「まっすぐ」は？", a: "Terus", n: "Jalan Terusでまっすぐ。" },
             { q: "「何？」は？", a: "Apa?", n: "聞き取れなかった時に聞き返します。" }
         ];
-
-        // 各機能を独立したtry-catchで囲み、1つが死んでも他が動くようにする
         window.loadDailyPhrase = function() {
             try {
                 var day = new Date().getDate();
@@ -245,14 +235,12 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 document.getElementById('phrase-note').innerText = p.n;
             } catch(e) {}
         };
-
         window.showPhraseAnswer = function() {
             try {
                 document.getElementById('phrase-ans-area').style.display = 'block';
                 document.getElementById('phrase-btn').style.display = 'none';
             } catch(e) {}
         };
-
         window.initTabs = function() {
             try {
                 var tabs = document.querySelectorAll('.tab-item');
@@ -260,7 +248,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 var newsGrid = document.getElementById('news-grid');
                 var survivalSec = document.getElementById('survival-section');
                 var phraseSec = document.getElementById('daily-phrase-section');
-
                 for (var i = 0; i < tabs.length; i++) {
                     tabs[i].onclick = function() {
                         var color = this.getAttribute('data-color');
@@ -283,7 +270,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 }
             } catch(e) {}
         };
-
         window.initAQI = function() {
             try {
                 var el = document.getElementById('pjn-aqi-status');
@@ -299,7 +285,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                     }).catch(function(){ el.innerText = "オフライン"; });
             } catch(e) {}
         };
-
         window.initNewBadges = function() {
             try {
                 var now = new Date();
@@ -312,7 +297,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 }
             } catch(e) {}
         };
-
         window.initScroll = function() {
             try {
                 var bar = document.getElementById('reading-progress-bar');
@@ -325,7 +309,6 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 };
             } catch(e) {}
         };
-
         window.changeFontSize = function(s, b) {
             try {
                 document.body.className = 'font-' + s;
@@ -334,30 +317,21 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 localStorage.setItem('pjn-fs', s);
             } catch(e) {}
         };
-
         window.copyLink = function(s) {
-            try {
-                navigator.clipboard.writeText(window.location.origin + "/posts/" + s).then(function() { alert("リンクをコピーしました！"); });
-            } catch(e) {}
+            navigator.clipboard.writeText(window.location.origin + "/posts/" + s).then(function() { alert("リンクをコピーしました！"); });
         };
-
         window.openArticle = function(s) {
-            try {
-                var card = document.querySelector('[data-slug="' + s + '"]');
-                if (card) {
-                    document.querySelectorAll('details').forEach(function(d) { d.open = false; });
-                    card.open = true;
-                    card.scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch(e) {}
+            var card = document.querySelector('[data-slug="' + s + '"]');
+            if (card) {
+                document.querySelectorAll('details').forEach(function(d) { d.open = false; });
+                card.open = true;
+                card.scrollIntoView({ behavior: 'smooth' });
+            }
         };
-
-        // 初期化実行（エラーが出ても次へ進むように個別に呼び出し）
         var fs = localStorage.getItem('pjn-fs') || 'medium';
         document.body.className = 'font-' + fs;
         var btn = document.getElementById('btn-' + fs);
         if (btn) btn.classList.add('active');
-
         window.loadDailyPhrase();
         window.initTabs();
         window.initNewBadges();
