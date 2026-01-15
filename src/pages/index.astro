@@ -1,4 +1,5 @@
 ---
+// --- 1. データの取得と準備 ---
 let posts = [];
 try {
     posts = await Astro.glob('./posts/*.md');
@@ -6,14 +7,18 @@ try {
     console.error("記事の読み込み失敗", e);
 }
 
-const sortedPosts = posts
-    .filter(post => post && post.frontmatter && post.frontmatter.title)
-    .sort((a, b) => {
-        const dateA = new Date(a.frontmatter.date || 0).getTime();
-        const dateB = new Date(b.frontmatter.date || 0).getTime();
-        if (dateB !== dateA) return dateB - dateA;
-        return b.file.localeCompare(a.file);
-    });
+// ジャンル設定（便利リンクを最後尾へ移動）
+const tabList = [
+    { id: "all", label: "トピック", color: "#ce1126" },
+    { id: "重要・安全", label: "重要・安全", color: "#ce1126" },
+    { id: "教育・学校", label: "教育・学校", color: "#005596" },
+    { id: "ビザ・生活行政", label: "ビザ・行政", color: "#2e7d32" },
+    { id: "医療・健康", label: "医療・健康", color: "#00838f" },
+    { id: "グルメ・店", label: "グルメ・店", color: "#ef6c00" },
+    { id: "お得・経済", label: "お得・経済", color: "#d4af37" },
+    { id: "PJN編集長 連載小説", label: "連載小説", color: "#6a1b9a" },
+    { id: "survival", label: "便利リンク", color: "#444" }
+];
 
 const survivalLinks = [
     { label: "PBA通報", icon: "💧", url: "https://wa.me/6042558255" },
@@ -26,21 +31,20 @@ const survivalLinks = [
     { label: "Wise", icon: "💸", url: "https://wise.com/jp/" }
 ];
 
-const tabList = [
-    { id: "all", label: "トピック", color: "#ce1126" },
-    { id: "survival", label: "便利リンク", color: "#444" }, // 便利リンク専用タブ
-    { id: "重要・安全", label: "重要・安全", color: "#ce1126" },
-    { id: "教育・学校", label: "教育・学校", color: "#005596" },
-    { id: "ビザ・生活行政", label: "ビザ・行政", color: "#2e7d32" },
-    { id: "医療・健康", label: "医療・健康", color: "#00838f" },
-    { id: "グルメ・店", label: "グルメ・店", color: "#ef6c00" },
-    { id: "お得・経済", label: "お得・経済", color: "#d4af37" },
-    { id: "PJN編集長 連載小説", label: "連載小説", color: "#6a1b9a" }
-];
+const allSortedPosts = posts
+    .filter(post => post && post.frontmatter && post.frontmatter.title)
+    .sort((a, b) => {
+        const dateA = new Date(a.frontmatter.date || 0).getTime();
+        const dateB = new Date(b.frontmatter.date || 0).getTime();
+        if (dateB !== dateA) return dateB - dateA;
+        return b.file.localeCompare(a.file);
+    });
 
-const novelPosts = sortedPosts.filter(p => p.frontmatter.category === "PJN編集長 連載小説").reverse();
+const novelPosts = allSortedPosts
+    .filter(p => p.frontmatter.category === "PJN編集長 連載小説")
+    .reverse();
 
-const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
+const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     const slug = post.file.split('/').pop().replace('.md', '');
     const isNovel = post.frontmatter.category === "PJN編集長 連載小説";
     let prevSlug = null; let nextSlug = null;
@@ -58,19 +62,32 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Penang Japanese News</title>
     <style define:vars={{ initialColor: tabList[0].color }}>
-        :root { --pjn-red: var(--initialColor); --bg-color: #f4f6f8; --theme-color: var(--initialColor); }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-color); color: #333; }
+        :root { --pjn-red: var(--initialColor); --bg-color: #f4f6f8; --theme-color: var(--initialColor); --article-font-size: 0.95rem; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-color); color: #333; transition: font-size 0.2s; }
         
+        /* 文字サイズ変更クラス */
+        body.font-small { --article-font-size: 0.85rem; }
+        body.font-medium { --article-font-size: 1rem; }
+        body.font-large { --article-font-size: 1.2rem; }
+
         header { background: var(--theme-color); color: white; padding: 1.1rem 0.5rem; text-align: center; position: sticky; top: 0; z-index: 1000; transition: background 0.5s ease; }
         header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; font-weight: bold; }
         .site-desc { font-size: 0.8rem; margin-top: 4px; opacity: 0.95; }
 
-        .info-bar { background: #333; color: white; padding: 6px 10px; font-size: 0.75rem; display: flex; justify-content: center; position: sticky; top: 68px; z-index: 999; height: 20px; align-items: center;}
+        #reading-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: transparent; z-index: 2000; }
+        #reading-progress-bar { height: 100%; width: 0%; background: #ffde33; transition: width 0.1s ease; }
+
+        .info-bar { background: #333; color: white; padding: 6px 10px; font-size: 0.75rem; display: flex; justify-content: space-between; position: sticky; top: 68px; z-index: 999; height: 25px; align-items: center;}
         .aqi-value { font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-left: 5px; }
         .aqi-good { background: #009966; } .aqi-moderate { background: #ffde33; color: #000; } .aqi-unhealthy { background: #ff9933; }
+        
+        /* 文字サイズコントローラー */
+        .font-sizer { display: flex; gap: 5px; align-items: center; }
+        .font-sizer button { background: #555; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; }
+        .font-sizer button.active { background: var(--pjn-red); font-weight: bold; }
 
-        .nav-container { background: #fff; position: sticky; top: 104px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        @media (min-width: 768px) { .nav-container { top: 130px; } .info-bar { top: 94px; } header h1 { font-size: 1.6rem; } }
+        .nav-container { background: #fff; position: sticky; top: 108px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        @media (min-width: 768px) { .nav-container { top: 133px; } .info-bar { top: 94px; } header h1 { font-size: 1.6rem; } }
 
         .nav-container::-webkit-scrollbar { display: none; }
         .nav-tabs { display: inline-flex; padding: 0 10px; margin: 0; list-style: none; }
@@ -78,8 +95,7 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         .tab-item.active { color: var(--theme-color); border-bottom: 3px solid var(--theme-color); }
         
         main { padding: 10px; max-width: 1400px; margin: auto; }
-
-        /* 便利リンク・セクション（特定の時だけ表示） */
+        
         #survival-section { display: none; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .survival-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         @media (min-width: 600px) { .survival-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -98,8 +114,9 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         .date { font-size: 0.7rem; color: #999; font-weight: bold; }
         .badge { font-size: 0.65rem; background: #f0f0f0; color: #555; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
         .new-badge { display: none; font-size: 0.7rem; background: #ff4757; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
+        
         .title { font-size: 1rem; font-weight: bold; line-height: 1.5; color: #111; display: block; }
-        .content { padding: 0 18px 18px; border-top: 1px solid #f5f5f5; font-size: 0.95rem; line-height: 1.8; color: #444; }
+        .content { padding: 0 18px 18px; border-top: 1px solid #f5f5f5; font-size: var(--article-font-size); line-height: 1.8; color: #444; }
         .hidden { display: none !important; }
         
         .share-box { margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ddd; display: flex; gap: 10px; }
@@ -108,11 +125,8 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         .novel-nav { margin-top: 20px; padding: 15px; background: #f9f0ff; border-radius: 8px; display: flex; justify-content: space-between; font-size: 0.85rem; border: 1px solid #e1bee7; }
         .novel-nav button { background: none; border: none; color: #6a1b9a; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
 
-        #reading-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: transparent; z-index: 2000; }
-        #reading-progress-bar { height: 100%; width: 0%; background: #ffde33; transition: width 0.1s ease; }
+        :global(h3) { font-size: 1.05rem; color: var(--theme-color); margin: 18px 0 10px; border-left: 4px solid var(--theme-color); padding-left: 10px; }
         #back-to-top { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--theme-color); color: white; border-radius: 50%; border: none; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1500; font-size: 24px; transition: background 0.5s; }
-        :global(h3) { font-size: 1.05rem; color: var(--theme-color); margin: 18px 0 10px; border-left: 4px solid var(--theme-color); padding-left: 10px; transition: color 0.5s; }
-        :global(.source-link) { display: inline-block; margin-top: 15px; font-size: 0.85rem; color: #005596; text-decoration: none; background: #f8f9fa; padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -122,7 +136,15 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         <p class="site-desc">ペナン現地ニュースを厳選、毎日日本語で更新</p>
     </header>
 
-    <div class="info-bar"><span id="pjn-aqi">ペナン空気指数(AQI): 取得中...</span></div>
+    <div class="info-bar">
+        <span id="pjn-aqi">AQI: 取得中...</span>
+        <div class="font-sizer">
+            <span style="font-size:0.6rem;margin-right:3px;">文字サイズ</span>
+            <button onclick="changeFontSize('small', this)">小</button>
+            <button class="active" onclick="changeFontSize('medium', this)">中</button>
+            <button onclick="changeFontSize('large', this)">大</button>
+        </div>
+    </div>
 
     <nav class="nav-container">
         <ul class="nav-tabs">
@@ -132,7 +154,6 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
         </ul>
     </nav>
     <main>
-        <!-- 便利リンクセクション（初期は非表示） -->
         <section id="survival-section">
             <div class="survival-grid">
                 {survivalLinks.map(link => (
@@ -144,7 +165,6 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
             </div>
         </section>
 
-        <!-- ニュースグリッド -->
         <div class="news-grid" id="news-grid">
             {processedPosts.map((post) => (
                 <details class="article-card" data-category={post.frontmatter.category} data-date={post.frontmatter.date} data-slug={post.slug}>
@@ -234,13 +254,19 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
                     if (json.status === 'ok') {
                         var aqi = json.data.aqi;
                         var cls = aqi > 100 ? 'aqi-unhealthy' : (aqi > 50 ? 'aqi-moderate' : 'aqi-good');
-                        el.innerHTML = 'ペナン空気指数(AQI): <span class="aqi-value ' + cls + '">' + aqi + '</span>';
+                        el.innerHTML = 'ペナンAQI: <span class="aqi-value ' + cls + '">' + aqi + '</span>';
                     }
                 });
         }
         function copyLink(slug) {
             var url = "https://penan-japanese-news.vercel.app/posts/" + slug;
             navigator.clipboard.writeText(url).then(() => alert("リンクをコピーしました！"));
+        }
+        function changeFontSize(size, btn) {
+            document.body.className = 'font-' + size;
+            document.querySelectorAll('.font-sizer button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            localStorage.setItem('pjn-font-size', size);
         }
         function openArticle(slug) {
             const card = document.querySelector('[data-slug="' + slug + '"]');
@@ -249,6 +275,15 @@ const processedPosts = await Promise.all(sortedPosts.map(async (post) => {
                 card.open = true;
                 card.scrollIntoView({ behavior: 'smooth' });
             }
+        }
+        // フォントサイズの復元
+        const savedFontSize = localStorage.getItem('pjn-font-size');
+        if (savedFontSize) {
+            document.body.className = 'font-' + savedFontSize;
+            document.querySelectorAll('.font-sizer button').forEach(b => {
+                if(b.innerText === (savedFontSize === 'small' ? '小' : savedFontSize === 'medium' ? '中' : '大')) b.classList.add('active');
+                else b.classList.remove('active');
+            });
         }
         initTabs(); initNewBadges(); initScrollEffects(); initAQI();
     </script>
