@@ -1,5 +1,5 @@
 ---
-// --- 1. データの取得 ---
+// --- 1. データの取得と準備（ビルド時） ---
 let posts = [];
 try {
     posts = await Astro.glob('./posts/*.md');
@@ -22,37 +22,73 @@ const tabList = [
     { id: "about", label: "案内・規約", color: "#666" }
 ];
 
-// --- 2. 徹底した並び替え（ソート）ロジック ---
+// 便利リンクデータ
+const survivalLinks = [
+    { label: "PBA通報", icon: "💧", url: "https://wa.me/6042558255" },
+    { label: "緊急 999", icon: "🚨", url: "tel:999" },
+    { label: "領事館", icon: "🇯🇵", url: "https://www.penang.my.emb-japan.go.jp/itprtop_ja/index.html" },
+    { label: "日本人会", icon: "🏫", url: "https://pja.org.my/" },
+    { label: "Grab", icon: "🚗", url: "https://www.grab.com/my/" },
+    { label: "MyJPJ", icon: "🪪", url: "https://public.jpj.gov.my/" },
+    { label: "TNG", icon: "📱", url: "https://www.touchngo.com.my/" },
+    { label: "Wise", icon: "💸", url: "https://wise.com/jp/" }
+];
+
+// 31日分のマレー語講座データ
+const dailyPhrases = [
+    { q: "注文時に「お持ち帰り」と言いたい時は？", a: "Tapau（タパオ）", note: "広東語由来。マレーシア全土で必須。" },
+    { q: "「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong", note: "Oは砂糖入り、Kosongは無を意味します。" },
+    { q: "店員さんを呼ぶ時の便利な愛称は？", a: "Boss（ボス）", note: "男性店員にはBoss!と呼ぶのがペナン流。" },
+    { q: "「ここで降ろして」とGrabで伝える時は？", a: "Sini saja", note: "「ここでいいよ」という意味で通じます。" },
+    { q: "「いくらですか？」と値段を聞く時は？", a: "Berapa?", note: "ショッピングや屋台で大活躍します。" },
+    { q: "マングリッシュの定番「Can lah」の意味は？", a: "「できるよ！」「いいよ！」", note: "語尾のLahは強調の定番です。" },
+    { q: "「ありがとう」はマレー語で？", a: "Terima Kasih", note: "笑顔で言うと喜ばれます。" },
+    { q: "「美味しい！」と伝えたい時は？", a: "Sedap", note: "「Sedap gila!」で「めちゃくちゃ旨い！」" },
+    { q: "お会計をお願いする時は？", a: "Bill, please", note: "英語でもマレー語（Kira）でも通じます。" },
+    { q: "「少しだけ」と言いたい時は？", a: "Sikit", note: "辛さを控えてほしい時に使います。" },
+    { q: "「はい」と「いいえ」は？", a: "Ya / Tak", note: "会話ではTidakを短くTakと言います。" },
+    { q: "「店内で飲む」と言いたい時は？", a: "Minum", note: "Drink?と聞かれたらMinum（店内）かTapau（外）。" },
+    { q: "「砂糖控えめ」は？", a: "Kurang Manis", note: "マレーシアの飲み物は標準だと激甘です。" },
+    { q: "「欲しい」は？", a: "Nak", note: "Nak Tapau（持ち帰りたい）のように使います。" },
+    { q: "「これ」は？", a: "Ini", note: "指差しながら「Ini satu」で1つ注文。" },
+    { q: "「ある（Have）」は？", a: "Ada", note: "在庫を聞く時に便利。「Ada Stock?（在庫ある？）」のように便利。" },
+    { q: "「ない（No have）」は？", a: "Tak ada", note: "Habis（ハビス＝売り切れ）もよく使われます。" },
+    { q: "「辛い」は？", a: "Pedas", note: "「Tak Nak Pedas」で辛くしないで。" },
+    { q: "女性店員さんへの愛称は？", a: "Kakak", note: "お姉さん。略してKak!と呼びます。" },
+    { q: "「まだ（Not yet）」は？", a: "Belum", note: "料理が来ない時にBelum sampai。" },
+    { q: "「トイレはどこ？」は？", a: "Tandas kat mana?", note: "Tandas=トイレ、Mana=どこ。" },
+    { q: "「高い」は？", a: "Mahal", note: "Mahal lah!と言うと安くなるかも？" },
+    { q: "「安い」は？", a: "Murah", note: "Very murah!と褒めましょう。" },
+    { q: "数字の1, 2, 3は？", a: "Satu, Dua, Tiga", note: "サトゥ、ドゥア、ティガ。個数に便利。" },
+    { q: "「行こう！」は？", a: "Jom!", note: "Jom Makan!（ご飯行こう！）" },
+    { q: "「上」と「下」は？", a: "Atas / Bawah", note: "場所の説明によく使います。" },
+    { q: "「おはよう」は？", a: "Selamat Pagi", note: "セキュリティへの挨拶に。" },
+    { q: "「すみません」は？", a: "Minta Maaf", note: "謝る時に。カジュアルにはSorry。" },
+    { q: "「左」と「右」は？", a: "Kiri / Kanan", note: "Grabの道案内に重宝します。" },
+    { q: "「まっすぐ」は？", a: "Terus", note: "Jalan Terusでまっすぐ。" },
+    { q: "「何？」は？", a: "Apa?", note: "聞き取れなかった時に聞き返します。" }
+];
+
+// 徹底した並び替えロジック
 const allSortedPosts = posts
     .filter(post => post && post.frontmatter && post.frontmatter.title)
     .sort((a, b) => {
-        // A. まず日付で比較（新しい日付が上）
         const dateA = new Date(a.frontmatter.date || 0).getTime();
         const dateB = new Date(b.frontmatter.date || 0).getTime();
         if (dateB !== dateA) return dateB - dateA;
 
-        // B. 同じ日付の中での優先順位（コラムと小説を下へ）
-        const getPriority = (category) => {
-            if (category === "PJN編集長 連載小説") return 3; // 最優先で下
-            if (category === "コラム") return 2;             // 次に下
-            return 1;                                     // 一般ニュースは上
+        const getPriority = (cat) => {
+            if (cat === "PJN編集長 連載小説") return 3;
+            if (cat === "コラム") return 2;
+            return 1;
         };
-
-        const priorityA = getPriority(a.frontmatter.category);
-        const priorityB = getPriority(b.frontmatter.category);
-
-        if (priorityA !== priorityB) {
-            return priorityA - priorityB; // 1(ニュース) -> 2(コラム) -> 3(小説) の順
-        }
-
-        // C. 同じ日付、かつ同じ優先度なら、ファイル名の降順（新しいビルドが上）
+        const pA = getPriority(a.frontmatter.category);
+        const pB = getPriority(b.frontmatter.category);
+        if (pA !== pB) return pA - pB;
         return b.file.localeCompare(a.file);
     });
 
-// 小説の前後リンク用
-const novelPosts = allSortedPosts
-    .filter(p => p.frontmatter.category === "PJN編集長 連載小説")
-    .reverse();
+const novelPosts = allSortedPosts.filter(p => p.frontmatter.category === "PJN編集長 連載小説").reverse();
 
 const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     const slug = post.file.split('/').pop().replace('.md', '');
@@ -71,6 +107,8 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Penang Japanese News (PJN)</title>
+    <meta name="description" content="ペナンの一次情報を精査。断水、治安、教育、ビザ、グルメなど、在住日本人に必要な情報を毎日日本語でお届けします。" />
+    
     <style define:vars={{ initialColor: tabList[0].color }}>
         :root { --pjn-red: var(--initialColor); --bg-color: #f4f6f8; --theme-color: var(--initialColor); --article-font-size: 0.95rem; }
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg-color); color: #333; transition: font-size 0.2s; }
@@ -132,7 +170,10 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     </header>
 
     <div class="info-bar">
-        <div class="aqi-container"><span class="aqi-label">ペナン空気の状態:</span><span id="pjn-aqi-status">取得中...</span></div>
+        <div class="aqi-container">
+            <span class="aqi-label">ペナン空気の状態:</span>
+            <span id="pjn-aqi-status">取得中...</span>
+        </div>
         <div class="font-sizer">
             <button id="btn-small" onclick="window.changeFontSize('small', this)">小</button>
             <button id="btn-medium" onclick="window.changeFontSize('medium', this)">中</button>
@@ -163,9 +204,9 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
                 <h3 style="border-left: 5px solid var(--pjn-red); padding-left: 10px; margin-bottom: 10px;">PJNメディア概要</h3>
                 <p style="line-height: 1.6; margin-bottom: 15px; font-size: 0.9rem;">Penang Japanese News (PJN) は、ペナン在住の日本人、留学生、駐在員ご家族のために、現地の一次情報を精査・再構成して日本語で届ける独立系ニュースメディアです。</p>
                 <h3 style="border-left: 5px solid var(--pjn-red); padding-left: 10px; margin-bottom: 10px;">著作権ポリシー</h3>
-                <p style="line-height: 1.6; margin-bottom: 15px; font-size: 0.9rem;">当サイトに掲載されている記事は、複数の現地メディア等の事実情報を基に、独自の構成・見出し・表現で執筆された「日本語による独自記事」です。記事全文の無断転載は固く禁止します。引用の際は、必ず当サイトのURLを明記してください。</p>
+                <p style="line-height: 1.6; margin-bottom: 15px; font-size: 0.9rem;">当サイトに掲載されている記事は、複数の現地メディア等の事実情報を基に、独自の構成・見出し・表現で執筆された「日本語による独自記事」です。記事全文の無断転載は固く禁止します。</p>
                 <h3 style="border-left: 5px solid var(--pjn-red); padding-left: 10px; margin-bottom: 10px;">免責事項</h3>
-                <p style="line-height: 1.6; margin-bottom: 15px; font-size: 0.9rem;">当サイトは情報の正確性に万全を期していますが、現地の状況変化等により内容が実情と異なる場合があります。掲載情報に基づいて発生した損害について、当サイトは一切の責任を負いかねます。</p>
+                <p style="line-height: 1.6; margin-bottom: 15px; font-size: 0.9rem;">当サイトは情報の正確性に万全を期していますが、状況変化等により内容が実情と異なる場合があります。掲載情報に基づいて発生した損害について、当サイトは一切の責任を負いかねます。</p>
             </div>
         </section>
 
@@ -212,14 +253,13 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
 
     <script is:inline define:vars={{ dailyPhrases }}>
-        var phrases = dailyPhrases;
         window.loadDailyPhrase = function() {
             try {
                 var day = new Date().getDate();
-                var p = phrases[(day - 1) % phrases.length];
+                var p = dailyPhrases[(day - 1) % dailyPhrases.length];
                 document.getElementById('phrase-q').innerText = p.q;
                 document.getElementById('phrase-a').innerText = p.a;
-                document.getElementById('phrase-note').innerText = p.note || p.n;
+                document.getElementById('phrase-note').innerText = p.note;
             } catch(e) {}
         };
         window.showPhraseAnswer = function() {
