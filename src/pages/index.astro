@@ -22,7 +22,6 @@ const tabList = [
     { id: "about", label: "案内・規約", color: "#666" }
 ];
 
-// 31日分のマレー語講座データ
 const dailyPhrases = [
     { q: "注文時に「お持ち帰り」と言いたい時は？", a: "Tapau（タパオ）", note: "広東語由来。マレーシア全土で必須。" },
     { q: "「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong", note: "Oは砂糖入り、Kosongは無を意味します。" },
@@ -33,7 +32,7 @@ const dailyPhrases = [
     { q: "「ありがとう」はマレー語で？", a: "Terima Kasih", note: "笑顔で言うと喜ばれます。" },
     { q: "「美味しい！」と伝えたい時は？", a: "Sedap", note: "「Sedap gila!」で「めちゃくちゃ旨い！」" },
     { q: "お会計をお願いする時は？", a: "Bill, please", note: "英語でもマレー語（Kira）でも通じます。" },
-    { q: "「少しだけ」と言いたい時は？", a: "Sikit", note: "辛さを控えてほしい時に使います。" },
+    { q: "「少しだけ」と言いたい時は？", a: "Sikit", note: "辛さを控えめにしてほしい時などに「Sikit saja」と使います。" },
     { q: "「はい」と「いいえ」は？", a: "Ya / Tak", note: "会話ではTidakを短くTakと言います。" },
     { q: "「店内で飲む」と言いたい時は？", a: "Minum", note: "Drink?と聞かれたらMinum（店内）かTapau（外）。" },
     { q: "「砂糖控えめ」は？", a: "Kurang Manis", note: "マレーシアの飲み物は標準だと激甘です。" },
@@ -45,7 +44,7 @@ const dailyPhrases = [
     { q: "女性店員さんへの愛称は？", a: "Kakak", note: "お姉さん。略してKak!と呼びます。" },
     { q: "「まだ（Not yet）」は？", a: "Belum", note: "料理が来ない時にBelum sampai。" },
     { q: "「トイレはどこ？」は？", a: "Tandas kat mana?", note: "Tandas=トイレ、Mana=どこ。" },
-    { q: "「高い」は？", a: "Mahal", note: "Mahal lah!と言うと安くなるかも？" },
+    { q: "「高い」は？", a: "Mahal", note: "高いよ〜と言うと安くなるかも？" },
     { q: "「安い」は？", a: "Murah", note: "Very murah!と褒めましょう。" },
     { q: "数字の1, 2, 3は？", a: "Satu, Dua, Tiga", note: "サトゥ、ドゥア、ティガ。個数に便利。" },
     { q: "「行こう！」は？", a: "Jom!", note: "Jom Makan!（ご飯行こう！）" },
@@ -110,40 +109,31 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         body.font-medium { --article-font-size: 1rem; }
         body.font-large { --article-font-size: 1.2rem; }
         
-        /* ヘッダーレイアウト：タイトルと検索窓を横並びに */
-        header { background: var(--theme-color); color: white; padding: 1rem; position: sticky; top: 0; z-index: 1000; transition: background 0.5s; }
-        .header-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .header-text { text-align: left; flex: 1; min-width: 200px; }
+        /* ヘッダー：隙間を埋めるためにmargin/paddingを調整 */
+        header { background: var(--theme-color); color: white; padding: 1rem 0.5rem; text-align: center; position: sticky; top: 0; z-index: 1000; transition: background 0.5s; margin: 0; border: none; }
         header h1 { margin: 0; font-size: 1.3rem; letter-spacing: 1px; }
         .site-desc { font-size: 0.75rem; margin-top: 4px; opacity: 0.9; }
 
-        /* 検索窓：右寄せ ＆ デザイン修正 */
-        .search-container { flex: 1; min-width: 280px; max-width: 400px; }
-        #search-ui { 
-            --pagefind-ui-background: #ffffff; 
-            --pagefind-ui-text: #333333; 
-            --pagefind-ui-border: #ddd;
-            --pagefind-ui-scale: 0.7;
-            border-radius: 8px; overflow: hidden;
-        }
-        /* 検索結果が赤背景にならないように強制上書き */
-        :global(.pagefind-ui__drawer) { background: #ffffff !important; color: #333 !important; border-radius: 0 0 8px 8px; }
-        :global(.pagefind-ui__result-link) { color: var(--pjn-red) !important; }
+        /* 検索窓：ヘッダー直下に配置 */
+        .search-box-container { background: #fff; padding: 10px; border-bottom: 1px solid #ddd; margin: 0; }
+        #search-ui { max-width: 600px; margin: 0 auto; --pagefind-ui-scale: 0.8; }
+        
+        /* 検索結果をすべて表示し、スクロール可能にする設定 */
+        :global(.pagefind-ui__drawer) { position: static !important; max-height: none !important; visibility: visible !important; opacity: 1 !important; display: block !important; }
+        :global(.pagefind-ui__results-area) { padding: 10px 0 !important; }
 
-        #reading-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: transparent; z-index: 2000; }
-        #reading-progress-bar { height: 100%; width: 0%; background: #ffde33; transition: width 0.1s ease; }
+        /* インフォバー：ヘッダーの高さに合わせてtopを調整 */
+        .info-bar { background: #333; color: white; padding: 6px 12px; font-size: 0.75rem; display: flex; justify-content: space-between; position: sticky; top: 74px; z-index: 999; min-height: 28px; align-items: center; margin: 0; }
+        @media (min-width: 768px) { .info-bar { top: 84px; } header h1 { font-size: 1.6rem; } }
 
-        .info-bar { background: #333; color: white; padding: 6px 12px; font-size: 0.75rem; display: flex; justify-content: space-between; position: sticky; top: 115px; z-index: 999; min-height: 28px; align-items: center;}
-        @media (max-width: 768px) { .info-bar { top: 135px; } .header-inner { flex-direction: column; text-align: center; } .header-text { text-align: center; } }
-
-        .aqi-container { display: flex; align-items: center; gap: 5px; }
         .aqi-value { font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; }
         .aqi-good { background: #009966; } .aqi-moderate { background: #d4af37; color: #000; } .aqi-unhealthy { background: #ce1126; }
         .font-sizer button { background: #555; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; }
         .font-sizer button.active { background: var(--pjn-red); font-weight: bold; }
 
-        .nav-container { background: #fff; position: sticky; top: 143px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; }
-        @media (min-width: 768px) { .nav-container { top: 153px; } }
+        /* ナビゲーション：インフォバーの高さに合わせてtopを調整 */
+        .nav-container { background: #fff; position: sticky; top: 102px; z-index: 998; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; white-space: nowrap; margin: 0; }
+        @media (min-width: 768px) { .nav-container { top: 112px; } }
         .nav-tabs { display: inline-flex; padding: 0 10px; margin: 0; list-style: none; }
         .tab-item { padding: 14px 20px; font-weight: bold; font-size: 0.9rem; color: #666; cursor: pointer; position: relative; transition: color 0.3s; }
         .tab-item.active { color: var(--theme-color); border-bottom: 3px solid var(--theme-color); }
@@ -178,14 +168,13 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
 <body>
     <div id="reading-progress-container"><div id="reading-progress-bar"></div></div>
     <header>
-        <div class="header-inner">
-            <div class="header-text">
-                <h1>PENANG JAPANESE NEWS</h1>
-                <p class="site-desc">ペナン現地ニュースを厳選、毎日日本語で更新</p>
-            </div>
-            <div class="search-container"><div id="search-ui"></div></div>
-        </div>
+        <h1>PENANG JAPANESE NEWS</h1>
+        <p class="site-desc">ペナン現地ニュースを厳選、毎日日本語で更新</p>
     </header>
+
+    <div class="search-box-container">
+        <div id="search-ui"></div>
+    </div>
 
     <div class="info-bar">
         <div class="aqi-container"><span class="aqi-label">ペナン空気の状態:</span><span id="pjn-aqi-status">取得中...</span></div>
