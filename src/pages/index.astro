@@ -23,6 +23,41 @@ const tabList = [
     { id: "about", label: "案内・規約", color: "#666" }
 ];
 
+// 31日分のマレー語講座データ（カタカナ読みを追加）
+const dailyPhrases = [
+    { q: "注文時に「お持ち帰り」と言いたい時は？", a: "Tapau（タパオ）", note: "広東語由来。マレーシア全土で必須。" },
+    { q: "「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong（コピ・オー・コソン）", note: "Oは砂糖入り、Kosongは無を意味します。" },
+    { q: "店員さんを呼ぶ時の便利な愛称は？", a: "Boss（ボス）", note: "男性店員にはBoss!と呼ぶのがペナン流。" },
+    { q: "「ここで降ろして」とGrabで伝える時は？", a: "Sini saja（シニ・サジャ）", note: "「ここでいいよ」という意味で通じます。" },
+    { q: "「いくらですか？」と値段を聞く時は？", a: "Berapa?（ブラパ？）", note: "ショッピングや屋台で大活躍します。" },
+    { q: "マングリッシュの定番「Can lah」の意味は？", a: "「できるよ！」「いいよ！」（キャン・ラー）", note: "語尾のLahは強調の定番です。" },
+    { q: "「ありがとう」はマレー語で？", a: "Terima Kasih（トゥリマ・カシ）", note: "笑顔で言うと喜ばれます。" },
+    { q: "「美味しい！」と伝えたい時は？", a: "Sedap（スダッ！）", note: "「Sedap gila!」で「めちゃくちゃ旨い！」" },
+    { q: "お会計をお願いする時は？", a: "Bill, please（ビル・プリーズ）", note: "英語でもマレー語（Kira）でも通じます。" },
+    { q: "「少しだけ」と言いたい時は？", a: "Sikit（シキッ）", note: "辛さを控えてほしい時に使います。" },
+    { q: "「はい」と「いいえ」は？", a: "Ya（ヤ） / Tak（タッ）", note: "会話ではTidakを短くTakと言います。" },
+    { q: "「店内で飲む」と言いたい時は？", a: "Minum（ミヌム）", note: "Drink?と聞かれたらMinum（店内）かTapau（外）。" },
+    { q: "「砂糖控えめ」は？", a: "Kurang Manis（クラン・マニス）", note: "マレーシアの飲み物は標準だと激甘です。" },
+    { q: "「欲しい」は？", a: "Nak（ナッ）", note: "Nak Tapau（持ち帰りたい）のように使います。" },
+    { q: "「これ」は？", a: "Ini（イニ）", note: "指差しながら「Ini satu」で1つ注文。" },
+    { q: "「ある（Have）」は？", a: "Ada（アダ）", note: "在庫を聞く時に便利。「Ada Stock?（在庫ある？）」。" },
+    { q: "「ない（No have）」は？", a: "Tak ada（タ・アダ）", note: "Habis（ハビス＝売り切れ）もよく使われます。" },
+    { q: "「辛い」は？", a: "Pedas（プダス）", note: "「Tak Nak Pedas」で辛くしないで。" },
+    { q: "女性店員さんへの愛称は？", a: "Kakak（カカッ）", note: "お姉さん。略してKak!と呼びます。" },
+    { q: "「まだ（Not yet）」は？", a: "Belum（ブルム）", note: "料理が来ない時にBelum sampai。" },
+    { q: "「トイレはどこ？」は？", a: "Tandas kat mana?（タンダス・カッ・マナ？）", note: "Tandas=トイレ、Mana=どこ。" },
+    { q: "「高い」は？", a: "Mahal（マハル）", note: "Mahal lah!と言うと安くなるかも？" },
+    { q: "「安い」は？", a: "Murah（ムラ）", note: "Very murah!と褒めましょう。" },
+    { q: "数字の1, 2, 3は？", a: "Satu, Dua, Tiga（サトゥ、ドゥア、ティガ）", note: "個数に便利。" },
+    { q: "「行こう！」は？", a: "Jom!（ジョム！）", note: "Jom Makan!（ご飯行こう！）" },
+    { q: "「上」と「下」は？", a: "Atas（アタス） / Bawah（バワ）", note: "場所の説明によく使います。" },
+    { q: "「おはよう」は？", a: "Selamat Pagi（スラマッ・パギ）", note: "セキュリティへの挨拶に。" },
+    { q: "「すみません」は？", a: "Minta Maaf（ミンタ・マアフ）", note: "謝る時に。カジュアルにはSorry。" },
+    { q: "「左」と「右」は？", a: "Kiri（キリ） / Kanan（カナン）", note: "Grabの道案内に重宝します。" },
+    { q: "「まっすぐ」は？", a: "Terus（トゥルス）", note: "Jalan Terusでまっすぐ。" },
+    { q: "「何？」は？", a: "Apa?（アパ？）", note: "聞き取れなかった時に聞き返します。" }
+];
+
 const survivalLinks = [
     { label: "PBA通報", icon: "💧", url: "https://wa.me/6042558255" },
     { label: "緊急 999", icon: "🚨", url: "tel:999" },
@@ -86,7 +121,7 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
         :global(.pagefind-ui__drawer) { position: absolute !important; top: 100%; left: 0; width: 100%; max-height: 60vh !important; overflow-y: auto !important; background: white !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1005 !important; border-bottom: 2px solid var(--pjn-red); }
         .info-bar { background: #333; color: white; padding: 6px 12px; font-size: 0.75rem; display: flex; justify-content: space-between; position: sticky; top: 136px; z-index: 1001; min-height: 28px; align-items: center; margin: 0; }
         .aqi-container { display: flex; align-items: center; gap: 5px; }
-        .aqi-value { font-weight: bold; padding: 2px 8px; border-radius: 4px; display: inline-block; color: white; }
+        .aqi-value { font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; }
         .aqi-good { background: #009966; } .aqi-moderate { background: #d4af37; color: #000; } .aqi-unhealthy { background: #ce1126; }
         .font-sizer button { background: #555; color: white; border: none; border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; }
         .font-sizer button.active { background: var(--pjn-red) !important; font-weight: bold; }
@@ -220,40 +255,40 @@ const processedPosts = await Promise.all(allSortedPosts.map(async (post) => {
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
 
     <script src="/pagefind/pagefind-ui.js" is:inline></script>
-    <script is:inline>
-        // 1. データをJS内に直接保持（キー名を統一してundefinedを防止）
+    <script is:inline define:vars={{ dailyPhrases }}>
+        // 1. データをJS内に直接保持（カタカナ読みを追加）
         var phrases = [
             { q: "注文時に「お持ち帰り」と言いたい時は？", a: "Tapau（タパオ）", note: "広東語由来。マレーシア全土で必須。" },
-            { q: "「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong", note: "Oは砂糖入り、Kosongは無を意味します。" },
+            { q: "「砂糖抜き（ブラック）」のコーヒーを頼む時は？", a: "Kopi O Kosong（コピ・オー・コソン）", note: "Oは砂糖入り、Kosongは無を意味します。" },
             { q: "店員さんを呼ぶ時の便利な愛称は？", a: "Boss（ボス）", note: "男性店員にはBoss!と呼ぶのがペナン流。" },
-            { q: "「ここで降ろして」とGrabで伝える時は？", a: "Sini saja", note: "「ここでいいよ」という意味で通じます。" },
-            { q: "「いくらですか？」と値段を聞く時は？", a: "Berapa?", note: "ショッピングや屋台で大活躍します。" },
-            { q: "マングリッシュの定番「Can lah」の意味は？", a: "「できるよ！」「いいよ！」", note: "語尾のLahは強調の定番です。" },
-            { q: "「ありがとう」はマレー語で？", a: "Terima Kasih", note: "笑顔で言うと喜ばれます。" },
-            { q: "「美味しい！」と伝えたい時は？", a: "Sedap", note: "「Sedap gila!」で「めちゃくちゃ旨い！」" },
-            { q: "お会計をお願いする時は？", a: "Bill, please", note: "英語でもマレー語（Kira）でも通じます。" },
-            { q: "「少しだけ」と言いたい時は？", a: "Sikit", note: "辛さを控えてほしい時に使います。" },
-            { q: "「はい」と「いいえ」は？", a: "Ya / Tak", note: "会話ではTidakを短くTakと言います。" },
-            { q: "「店内で飲む」と言いたい時は？", a: "Minum", note: "Drink?と聞かれたらMinum（店内）かTapau（外）。" },
-            { q: "「砂糖控えめ」は？", a: "Kurang Manis", note: "マレーシアの飲み物は標準だと激甘です。" },
-            { q: "「欲しい」は？", a: "Nak", note: "Nak Tapau（持ち帰りたい）のように使います。" },
-            { q: "「これ」は？", a: "Ini", note: "指差しながら「Ini satu」で1つ注文。" },
-            { q: "「ある（Have）」は？", a: "Ada", note: "在庫を聞く時に便利。「Ada Stock?（在庫ある？）」。" },
-            { q: "「ない（No have）」は？", a: "Tak ada", note: "Habis（ハビス＝売り切れ）もよく使われます。" },
-            { q: "「辛い」は？", a: "Pedas", note: "「Tak Nak Pedas」で辛くしないで。" },
-            { q: "女性店員さんへの愛称は？", a: "Kakak", note: "お姉さん。略してKak!と呼びます。" },
-            { q: "「まだ（Not yet）」は？", a: "Belum", note: "料理が来ない時にBelum sampai。" },
-            { q: "「トイレはどこ？」は？", a: "Tandas kat mana?", note: "Tandas=トイレ、Mana=どこ。" },
-            { q: "「高い」は？", a: "Mahal", note: "Mahal lah!と言うと安くなるかも？" },
-            { q: "「安い」は？", a: "Murah", note: "Very murah!と褒めましょう。" },
-            { q: "数字の1, 2, 3は？", a: "Satu, Dua, Tiga", note: "サトゥ、ドゥア、ティガ。個数に便利。" },
-            { q: "「行こう！」は？", a: "Jom!", note: "Jom Makan!（ご飯行こう！）" },
-            { q: "「上」と「下」は？", a: "Atas / Bawah", note: "場所の説明によく使います。" },
-            { q: "「おはよう」は？", a: "Selamat Pagi", note: "セキュリティへの挨拶に。" },
-            { q: "「すみません」は？", a: "Minta Maaf", note: "謝る時に。カジュアルにはSorry。" },
-            { q: "「左」と「右」は？", a: "Kiri / Kanan", note: "Grabの道案内に重宝します。" },
-            { q: "「まっすぐ」は？", a: "Terus", note: "Jalan Terusでまっすぐ。" },
-            { q: "「何？」は？", a: "Apa?", note: "聞き取れなかった時に聞き返します。" }
+            { q: "「ここで降ろして」とGrabで伝える時は？", a: "Sini saja（シニ・サジャ）", note: "「ここでいいよ」という意味で通じます。" },
+            { q: "「いくらですか？」と値段を聞く時は？", a: "Berapa?（ブラパ？）", note: "ショッピングや屋台で大活躍します。" },
+            { q: "マングリッシュの定番「Can lah」の意味は？", a: "「できるよ！」「いいよ！」（キャン・ラー）", note: "語尾のLahは強調の定番です。" },
+            { q: "「ありがとう」はマレー語で？", a: "Terima Kasih（トゥリマ・カシ）", note: "笑顔で言うと喜ばれます。" },
+            { q: "「美味しい！」と伝えたい時は？", a: "Sedap（スダッ！）", note: "「Sedap gila!」で「めちゃくちゃ旨い！」" },
+            { q: "お会計をお願いする時は？", a: "Bill, please（ビル・プリーズ）", note: "英語でもマレー語（Kira）でも通じます。" },
+            { q: "「少しだけ」と言いたい時は？", a: "Sikit（シキッ）", note: "辛さを控えてほしい時に使います。" },
+            { q: "「はい」と「いいえ」は？", a: "Ya（ヤ） / Tak（タッ）", note: "会話ではTidakを短くTakと言います。" },
+            { q: "「店内で飲む」と言いたい時は？", a: "Minum（ミヌム）", note: "Drink?と聞かれたらMinum（店内）かTapau（外）。" },
+            { q: "「砂糖控えめ」は？", a: "Kurang Manis（クラン・マニス）", note: "マレーシアの飲み物は標準だと激甘です。" },
+            { q: "「欲しい」は？", a: "Nak（ナッ）", note: "Nak Tapau（持ち帰りたい）のように使います。" },
+            { q: "「これ」は？", a: "Ini（イニ）", note: "指差しながら「Ini satu」で1つ注文。" },
+            { q: "「ある（Have）」は？", a: "Ada（アダ）", note: "在庫を聞く時に便利。「Ada Stock?（在庫ある？）」。" },
+            { q: "「ない（No have）」は？", a: "Tak ada（タ・アダ）", note: "Habis（ハビス＝売り切れ）もよく使われます。" },
+            { q: "「辛い」は？", a: "Pedas（プダス）", note: "「Tak Nak Pedas」で辛くしないで。" },
+            { q: "女性店員さんへの愛称は？", a: "Kakak（カカッ）", note: "お姉さん。略してKak!と呼びます。" },
+            { q: "「まだ（Not yet）」は？", a: "Belum（ブルム）", note: "料理が来ない時にBelum sampai。" },
+            { q: "「トイレはどこ？」は？", a: "Tandas kat mana?（タンダス・カッ・マナ？）", note: "Tandas=トイレ、Mana=どこ。" },
+            { q: "「高い」は？", a: "Mahal（マハル）", note: "Mahal lah!と言うと安くなるかも？" },
+            { q: "「安い」は？", a: "Murah（ムラ）", note: "Very murah!と褒めましょう。" },
+            { q: "数字の1, 2, 3は？", a: "Satu, Dua, Tiga（サトゥ、ドゥア、ティガ）", note: "個数に便利。" },
+            { q: "「行こう！」は？", a: "Jom!（ジョム！）", note: "Jom Makan!（ご飯行こう！）" },
+            { q: "「上」と「下」は？", a: "Atas（アタス） / Bawah（バワ）", note: "場所の説明によく使います。" },
+            { q: "「おはよう」は？", a: "Selamat Pagi（スラマッ・パギ）", note: "セキュリティへの挨拶に。" },
+            { q: "「すみません」は？", a: "Minta Maaf（ミンタ・マアフ）", note: "謝る時に。カジュアルにはSorry。" },
+            { q: "「左」と「右」は？", a: "Kiri（キリ） / Kanan（カナン）", note: "Grabの道案内に重宝します。" },
+            { q: "「まっすぐ」は？", a: "Terus（トゥルス）", note: "Jalan Terusでまっすぐ。" },
+            { q: "「何？」は？", a: "Apa?（アパ？）", note: "聞き取れなかった時に聞き返します。" }
         ];
 
         window.loadDailyPhrase = function() {
