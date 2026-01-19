@@ -17,4 +17,4 @@ category: "お得・経済"
 日本人居住エリアでも、バス停までの「ラストワンマイル」を繋ぐ手段として利用者が増えているサービスです。
 2月以降の利用時には、アプリ内の残高設定や支払い準備を新料金に合わせて確認しておく必要があります。
 
-<a href="https://www.malaymail.com/news/malaysia/2026/01/19/rapid-on-demand-users-take-note-rm2-fare-starts-feb-1-as-rm1-promo-ends/" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：Malay Mail（2026/01/19発行）</a>
+<a href="https://www.malaymail.com/news/malaysia/2026/01/19/rapid-on-demand-users-take-note-rm2-fare-starts-feb-1-as-rm1-promo-ends/205992" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：Malay Mail（2026/01/19発行）</a>
