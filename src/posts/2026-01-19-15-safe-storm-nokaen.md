@@ -16,4 +16,4 @@ category: "重要・安全"
 
 今夜から週明けにかけて、フェリーでの移動や沿岸部でのレジャーを予定されている方は、気象局が随時更新する最新のアドバイザリーに留意してください。
 
-<a href="https://www.malaymail.com/news/malaysia/2026/01/19/metmalaysia-issues-advisory-on-tropical-storm-nokaen/" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：Malay Mail（2026/01/19発行）</a>
+<a href="https://www.malaymail.com/news/malaysia/2026/01/19/metmalaysia-issues-advisory-on-tropical-storm-nokaen/205945" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：Malay Mail（2026/01/19発行）</a>
