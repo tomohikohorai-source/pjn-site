@@ -16,4 +16,4 @@ category: "重要・安全"
 
 旧正月期間中にペナンから他州への旅行や、KL経由での一時帰国を予定されている日本人の皆様にとって、移動手段の選択肢が増える重要なファクトとなります。
 
-<a href="https://www.malaymail.com/news/malaysia/2026/01/19/flying-home-for-cny-malaysia-airlines-and-firefly-fix-fares-add-late-night-flights-to-east-malaysia/205804" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：Malay Mail（2026/01/19発行）</a>
+<a href="https://www.malaymail.com/news/malaysia/2026/01/19/flying-home-for-cny-malaysia-airlines-and-firefly-fix-fares-add-latenight-flights-to-east-malaysia/205995" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：Malay Mail（2026/01/19発行）</a>
