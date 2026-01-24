@@ -15,4 +15,4 @@ category: "ビザ・行政"
 
 この訪問は、保健、文化、観光・遺産振興を含む幅広い分野で、ペナンが国政の注目点となっていることを示しています。
 
-<a href="https://www.bernama.com/en/news.php?id=2515904" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：BERNAMA（2026/01/24発行）</a>
+<a href="https://www.malaymail.com/news/malaysia/2026/01/24/anwar-on-one-day-working-visit-to-penang-and-kedah-to-launch-seberang-jaya-hospital-guar-kepah-archaeological-gallery/206554?utm_source=chatgpt.com" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：BERNAMA（2026/01/24発行）</a>
