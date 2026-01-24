@@ -15,4 +15,4 @@ category: "重要・安全"
 
 火災は短時間で広がる危険性があります。火の取り扱いには十分注意し、不審な煙や火災を発見した場合は、速やかに当局に通報してください。
 
-<a href="https://www.thestar.com.my/news/nation/2026/01/24/penang-firefighters-tackle-12-open-burnings-in-12-hours-fuelled-by-hot-dry-weather" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：The Star Online（2026/01/24発行）</a>
+<a href="https://www.thesun.my/news/malaysia-news/penang-fire-crews-tackle-12-open-burning-cases-amid-dry-spell/" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：The Star Online（2026/01/24発行）</a>
