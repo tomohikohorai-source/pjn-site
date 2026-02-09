@@ -1,6 +1,6 @@
 ---
 title: "青い洋館の継承者：第14回「未来の選択、洋館の新たな物語」"
-date: "2026-02-10"
+date: "2026-02-09"
 category: "PJN編集長 連載小説"
 ---
 <div class="genre-label">ジャンル：PJN編集長 連説小説</div>
