@@ -1,0 +1,21 @@
+---
+title: "【重要】ペナン国際空港隣接の大型物流拠点「PILA」が正式承認。2029年稼働へ"
+date: "2026-04-27"
+category: "お得・経済"
+---
+<div class="genre-label">ジャンル：お得・経済（インフラ・物流）</div>
+<h3>空港隣接の42ヘクタール。半導体・電子産業の輸出入を強力にバックアップ</h3>
+
+ペナン州の物流機能を劇的に進化させる大規模プロジェクト「ペナン国際物流エアロパーク（PILA：Penang International Logistics Aeropark）」が、正式に当局の承認を受けたことが報じられました。
+
+このプロジェクトは、ペナン国際空港に隣接するバトゥ・マウン（Batu Maung）地区の約42ヘクタールにおよぶ広大な敷地に建設されます。2029年の稼働開始を目指しており、ペナンの主力産業である半導体や電子機器の「製造から輸出までの一体化」を加速させる、極めて重要なインフラ拠点となります。
+
+・名称：Penang International Logistics Aeropark (PILA)
+・場所：バトゥ・マウン（ペナン国際空港隣接）
+・規模：面積 約42ヘクタール
+・稼働予定：2029年
+・意義：サプライチェーンの効率化、国際競争力の強化
+
+空港至近に高度な物流ハブが整備されることで、輸送コストの削減やリードタイムの短縮が期待されており、ペナンが東南アジアにおけるハイテク産業のゲートウェイとしての地位をさらに強固にするものと注目されています。
+
+<a href="https://www.thestar.com.my/metro/metro-news/2026/04/27/approval-secured-for-new-logistics-aeropark-near-penang-airport" target="_blank" rel="noopener noreferrer" class="source-link">🔗 参照元：The Star Online（2026/04/27発行）</a>
